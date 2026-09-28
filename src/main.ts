@@ -1,4 +1,10 @@
-import { InstanceBase, runEntrypoint, InstanceStatus, SomeCompanionConfigField } from '@companion-module/base'
+import {
+	InstanceBase,
+	runEntrypoint,
+	InstanceStatus,
+	SomeCompanionConfigField,
+	type CompanionVariableValues,
+} from '@companion-module/base'
 import { GetConfigFields, type ModuleConfig, type ModuleSecrets } from './config.js'
 import { BuildDeviceVariableDefinitions, SeedDeviceVariableValues } from './variables.js'
 import { UpgradeScripts } from './upgrades.js'
@@ -24,7 +30,7 @@ import {
 	SeedPicoVariableValues,
 	type PicoButtonState,
 } from './picoButtons.js'
-import { BuildFanVariableDefinitions, SeedFanVariableValues } from './fans.js'
+import { BuildFanVariableDefinitions, SeedFanVariableValues, FAN_SPEED_PERCENT } from './fans.js'
 import { RefreshScenes } from './scenes.js'
 
 const PAIRING_PORT = 8083
@@ -47,6 +53,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	picoButtons: Record<string, PicoButtonState>
 	currentFanSpeed: Record<string, FanSpeedType>
 	fanVariableIds: Record<string, string>
+	fanPercentVariableIds: Record<string, string>
 	scenes: Record<string, VirtualButtonDefinition>
 	isReconnecting: boolean
 	isDestroyed: boolean
@@ -64,6 +71,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.scenes = {}
 		this.currentFanSpeed = {}
 		this.fanVariableIds = {}
+		this.fanPercentVariableIds = {}
 		this.isReconnecting = false
 		this.isDestroyed = false
 	}
@@ -465,10 +473,14 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		const speed = body.ZoneStatus.FanSpeed
 		this.currentFanSpeed[device.SerialNumber] = speed
 
+		const values: CompanionVariableValues = {}
 		const variableId = this.fanVariableIds[device.SerialNumber]
-		if (variableId) {
-			this.setVariableValues({ [variableId]: speed })
-		}
+		if (variableId) values[variableId] = speed
+
+		const percentVariableId = this.fanPercentVariableIds[device.SerialNumber]
+		if (percentVariableId) values[percentVariableId] = FAN_SPEED_PERCENT[speed]
+
+		this.setVariableValues(values)
 	}
 
 	// Return config fields for web config

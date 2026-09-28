@@ -12,6 +12,19 @@ import { isFanDevice, getDeviceLabel, slugify } from './deviceTypes.js'
 // these 5 values.
 export const FAN_SPEED_CHOICES: FanSpeedType[] = ['Off', 'Low', 'Medium', 'MediumHigh', 'High']
 
+// Lutron's LEAP API never reports a numeric fan speed -- FanSpeed is always one of
+// the 5 names above. This mapping is our own assumption (an even 25% step per
+// speed), not something confirmed from Lutron documentation or the API itself.
+// Provided as a convenience for button-text formatting/math alongside the
+// authoritative text variable, not as a replacement for it.
+export const FAN_SPEED_PERCENT: Record<FanSpeedType, number> = {
+	Off: 0,
+	Low: 25,
+	Medium: 50,
+	MediumHigh: 75,
+	High: 100,
+}
+
 export function BuildFanVariableDefinitions(self: ModuleInstance): CompanionVariableDefinition[] {
 	const entries = self.devicesOnBridge
 		.filter((device) => isFanDevice(device))
@@ -22,15 +35,20 @@ export function BuildFanVariableDefinitions(self: ModuleInstance): CompanionVari
 	const usedIds = new Set<string>()
 
 	self.fanVariableIds = {}
+	self.fanPercentVariableIds = {}
 	entries.forEach(({ device, label }) => {
-		let variableId = `${slugify(label)}_fan_speed`
-		if (usedIds.has(variableId)) {
-			variableId = `${slugify(label)}_${device.SerialNumber}_fan_speed`
+		let base = slugify(label)
+		if (usedIds.has(`${base}_fan_speed`)) {
+			base = `${slugify(label)}_${device.SerialNumber}`
 		}
-		usedIds.add(variableId)
+		usedIds.add(`${base}_fan_speed`)
 
-		self.fanVariableIds[device.SerialNumber] = variableId
-		variables.push({ variableId, name: label })
+		self.fanVariableIds[device.SerialNumber] = `${base}_fan_speed`
+		self.fanPercentVariableIds[device.SerialNumber] = `${base}_fan_speed_percent`
+		variables.push(
+			{ variableId: `${base}_fan_speed`, name: label },
+			{ variableId: `${base}_fan_speed_percent`, name: `${label} (Percent)` },
+		)
 	})
 
 	return variables
@@ -41,10 +59,13 @@ export function SeedFanVariableValues(self: ModuleInstance): void {
 	self.devicesOnBridge.forEach((device) => {
 		if (!isFanDevice(device)) return
 		const speed = self.currentFanSpeed[device.SerialNumber]
+		if (speed === undefined) return
+
 		const variableId = self.fanVariableIds[device.SerialNumber]
-		if (speed !== undefined && variableId) {
-			values[variableId] = speed
-		}
+		if (variableId) values[variableId] = speed
+
+		const percentVariableId = self.fanPercentVariableIds[device.SerialNumber]
+		if (percentVariableId) values[percentVariableId] = FAN_SPEED_PERCENT[speed]
 	})
 	self.setVariableValues(values)
 }
@@ -74,7 +95,7 @@ function createFanSpeedAction(
 				id: 'speed',
 				type: 'dropdown',
 				label: 'Speed',
-				default: 'Off',
+				default: 'Medium',
 				choices: FAN_SPEED_CHOICES.map((speed) => ({ id: speed, label: speed })),
 			},
 		],
