@@ -119,15 +119,29 @@ function createLevelAction(
 			max: 100,
 			isVisible: (opts) => opts.mode === 'brighten' || opts.mode === 'dim',
 		})
+		// Two fields (rather than one shared default) so "turning on" and "turning
+		// off" can have different defaults -- a fast fade up, a slower fade down.
 		options.push({
-			id: 'fade_time',
+			id: 'fade_time_on',
 			type: 'number',
 			label: 'Fade Time (seconds)',
-			default: 4,
+			default: 0.75,
 			min: 0,
 			max: 10,
 			step: 0.25,
 			range: true,
+			isVisible: (opts) => opts.mode !== 'off',
+		})
+		options.push({
+			id: 'fade_time_off',
+			type: 'number',
+			label: 'Fade Time (seconds)',
+			default: 2.5,
+			min: 0,
+			max: 10,
+			step: 0.25,
+			range: true,
+			isVisible: (opts) => opts.mode === 'off',
 		})
 	}
 
@@ -166,7 +180,10 @@ function createLevelAction(
 			}
 
 			// fade time input is in seconds but needs to be formatted for the API. So 1.75 seconds becomes "00:00:01.7500"
-			const fadeTimeValue = levelType === 'dimmer' ? (event.options.fade_time as number) || 0 : 0
+			const fadeTimeValue =
+				levelType === 'dimmer'
+					? ((mode === 'off' ? event.options.fade_time_off : event.options.fade_time_on) as number) || 0
+					: 0
 			const fadeTimeFormatted = `00:00:${Math.floor(fadeTimeValue).toString().padStart(2, '0')}.${((fadeTimeValue % 1) * 10000).toFixed(0).padStart(4, '0')}`
 
 			try {
