@@ -1843,9 +1843,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lutron-caseta@workspace:.":
+"lutron-caseta-advanced@workspace:.":
   version: 0.0.0-use.local
-  resolution: "lutron-caseta@workspace:."
+  resolution: "lutron-caseta-advanced@workspace:."
   dependencies:
     "@companion-module/base": "npm:^1.14.1"
     "@companion-module/tools": "npm:^2.8.0"
