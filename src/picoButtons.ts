@@ -4,6 +4,13 @@ import { isPicoDevice, getDeviceLabel, slugify } from './deviceTypes.js'
 
 export const LAST_PRESSED_VARIABLE_ID = 'last_pico_button_pressed'
 
+// A standard Pico never sends a discrete "LongHold" event -- confirmed against real
+// bridge data, holding a button for ~2-4s produced only Press then Release, nothing
+// in between. So long-hold has to be inferred from the gap between them. (The
+// 'LongHold' EventType in the library's types is honored if it's ever actually sent
+// by some device, but nothing we've tested sends it.)
+const LONG_HOLD_THRESHOLD_MS = 500
+
 // Keyed by rank after sorting a device's buttons by ButtonNumber, not by raw
 // ButtonNumber itself -- Lutron's ButtonNumber base-index is inconsistent between
 // device types (0-indexed on RaiseLower, 1-indexed on Scene, confirmed against real
@@ -24,6 +31,7 @@ export interface PicoButtonState {
 	href: string
 	isPressed: boolean
 	sawLongHold: boolean
+	pressStartTime?: number
 	pressCount: number
 	longHoldCount: number
 	variableIdIsPressed: string
@@ -126,15 +134,20 @@ export function HandlePicoButtonEvent(
 		case 'Press':
 			state.isPressed = true
 			state.sawLongHold = false
+			state.pressStartTime = Date.now()
 			self.log('info', `Button pressed: ${state.fullLabel}`)
 			values[LAST_PRESSED_VARIABLE_ID] = state.fullLabel
 			break
 		case 'LongHold':
+			// Respected if a device ever actually sends this, but the duration check
+			// at Release is what actually catches long holds in practice.
 			state.sawLongHold = true
 			break
-		case 'Release':
+		case 'Release': {
 			state.isPressed = false
-			if (state.sawLongHold) {
+			const heldMs = state.pressStartTime !== undefined ? Date.now() - state.pressStartTime : 0
+			const wasLongHold = state.sawLongHold || heldMs >= LONG_HOLD_THRESHOLD_MS
+			if (wasLongHold) {
 				state.longHoldCount++
 				if (state.variableIdLongHoldCount) values[state.variableIdLongHoldCount] = state.longHoldCount
 			} else {
@@ -142,6 +155,7 @@ export function HandlePicoButtonEvent(
 				if (state.variableIdPressCount) values[state.variableIdPressCount] = state.pressCount
 			}
 			break
+		}
 	}
 
 	if (state.variableIdIsPressed) {
