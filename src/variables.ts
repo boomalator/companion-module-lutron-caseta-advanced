@@ -5,9 +5,10 @@ import { getDeviceLevelType, getDeviceLabel, slugify } from './deviceTypes.js'
 export function UpdateVariableDefinitions(self: ModuleInstance): void {
 	const entries = self.devicesOnBridge
 		.map((device) => {
-			if (!getDeviceLevelType(device)) return undefined
+			const levelType = getDeviceLevelType(device)
+			if (!levelType) return undefined
 			const label = getDeviceLabel(self.deviceAreaNames[device.SerialNumber] ?? '', device)
-			return { device, label }
+			return { device, label, suffix: levelType === 'dimmer' ? 'brightness' : 'state' }
 		})
 		.filter((entry) => entry !== undefined)
 		.sort((a, b) => a.label.localeCompare(b.label))
@@ -16,11 +17,11 @@ export function UpdateVariableDefinitions(self: ModuleInstance): void {
 	const usedIds = new Set<string>()
 
 	self.deviceVariableIds = {}
-	entries.forEach(({ device, label }) => {
-		let variableId = `brightness_${slugify(label)}`
+	entries.forEach(({ device, label, suffix }) => {
+		let variableId = `${slugify(label)}_${suffix}`
 		if (usedIds.has(variableId)) {
 			// disambiguate the rare case of two devices sharing the same area+name
-			variableId = `${variableId}_${device.SerialNumber}`
+			variableId = `${slugify(label)}_${device.SerialNumber}_${suffix}`
 		}
 		usedIds.add(variableId)
 
