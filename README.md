@@ -1,4 +1,6 @@
-# companion-module-lutron-caseta
+# companion-module-lutron-caseta-advanced
+
+An extended fork of [companion-module-lutron-caseta](https://github.com/bitfocus/companion-module-lutron-caseta) with additional functionality, tested against a Lutron Caseta Smart Bridge Pro. This fork carries breaking changes and is not intended to be merged back upstream.
 
 See [HELP.md](./companion/HELP.md) and [LICENSE](./LICENSE)
 

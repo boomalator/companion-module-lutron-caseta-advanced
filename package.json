@@ -1,5 +1,5 @@
 {
-	"name": "lutron-caseta",
+	"name": "lutron-caseta-advanced",
 	"version": "0.1.1",
 	"main": "dist/main.js",
 	"type": "module",
@@ -16,7 +16,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/bitfocus/companion-module-lutron-caseta.git"
+		"url": "git+https://github.com/boomalator/companion-module-lutron-caseta-advanced.git"
 	},
 	"engines": {
 		"node": "^22.20",

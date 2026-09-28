@@ -104,7 +104,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		csr.setSubject([
 			{
 				name: 'commonName',
-				value: 'companion-module-lutron-caseta',
+				value: 'companion-module-lutron-caseta-advanced',
 			},
 		])
 		csr.sign(keys.privateKey)

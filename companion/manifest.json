@@ -1,12 +1,12 @@
 {
-	"id": "lutron-caseta",
-	"name": "Lutron Caseta",
-	"shortname": "lutron-caseta",
-	"description": "Control Lutron devices connected to a compatible Lutron Smart Bridge",
+	"id": "lutron-caseta-advanced",
+	"name": "Lutron Caseta Advanced",
+	"shortname": "lutron-caseta-advanced",
+	"description": "Control Lutron devices connected to a compatible Lutron Smart Bridge Pro/hub (extended fork with breaking changes)",
 	"version": "0.1.1",
 	"license": "GPL-3.0-only",
-	"repository": "git+https://github.com/bitfocus/companion-module-lutron-caseta.git",
-	"bugs": "https://github.com/bitfocus/companion-module-lutron-caseta/issues",
+	"repository": "git+https://github.com/boomalator/companion-module-lutron-caseta-advanced.git",
+	"bugs": "https://github.com/boomalator/companion-module-lutron-caseta-advanced/issues",
 	"maintainers": [
 		{
 			"name": "Bear Cherian",
