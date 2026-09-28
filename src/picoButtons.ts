@@ -4,6 +4,18 @@ import { isPicoDevice, getDeviceLabel, slugify } from './deviceTypes.js'
 
 export const LAST_PRESSED_VARIABLE_ID = 'last_pico_button_pressed'
 
+// Keyed by rank after sorting a device's buttons by ButtonNumber, not by raw
+// ButtonNumber itself -- Lutron's ButtonNumber base-index is inconsistent between
+// device types (0-indexed on RaiseLower, 1-indexed on Scene, confirmed against real
+// bridge data), and for RaiseLower the numbers don't follow physical top-to-bottom
+// order anyway (visually: On, Raise, Favorite, Lower, Off; numbered 1, 4, 2, 5, 3).
+// Sorted rank order works out to a stable, meaningful sequence for both.
+const PICO_BUTTON_LABELS_BY_RANK: Record<string, string[]> = {
+	Pico2Button: ['On', 'Off'],
+	Pico3ButtonRaiseLower: ['On', 'Favorite', 'Off', 'Raise', 'Lower'],
+	Pico4ButtonScene: ['All On', 'Scene A', 'Scene B', 'All Off'],
+}
+
 export interface PicoButtonState {
 	deviceSerial: string
 	deviceLabel: string
@@ -62,8 +74,14 @@ export async function SubscribeToPicoButtons(self: ModuleInstance): Promise<void
 					continue
 				}
 
-				for (const button of buttons) {
-					const buttonLabel = button.Engraving?.Text || button.Name || `Button ${button.ButtonNumber}`
+				const sortedButtons = [...buttons].sort((a, b) => a.ButtonNumber - b.ButtonNumber)
+				for (const [index, button] of sortedButtons.entries()) {
+					const rank = index + 1
+					const buttonLabel =
+						PICO_BUTTON_LABELS_BY_RANK[device.DeviceType]?.[rank - 1] ||
+						button.Engraving?.Text ||
+						button.Name ||
+						`Button ${rank}`
 					const fullLabel = `${deviceLabel} - ${buttonLabel}`
 
 					const state: PicoButtonState = {
