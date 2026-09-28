@@ -3,6 +3,7 @@ import type { ModuleInstance } from './main.js'
 import { DeviceDefinition } from 'lutron-leap'
 import { getDeviceLevelType, getDeviceLabel, type DeviceLevelType } from './deviceTypes.js'
 import { BuildFanActions } from './fans.js'
+import { BuildSceneActions, RefreshScenes } from './scenes.js'
 
 export function UpdateActions(self: ModuleInstance): void {
 	const entries = self.devicesOnBridge
@@ -23,6 +24,7 @@ export function UpdateActions(self: ModuleInstance): void {
 	self.setActionDefinitions({
 		...deviceActions,
 		...BuildFanActions(self),
+		...BuildSceneActions(self),
 		...createSystemActions(self),
 	})
 }
@@ -48,6 +50,15 @@ function createSystemActions(self: ModuleInstance): Record<string, CompanionActi
 			callback: async () => {
 				self.log('info', 'Manual reconnect requested')
 				await self.handleBridgeDisconnected()
+			},
+		},
+		system_refresh_scenes: {
+			name: 'System: Refresh Scenes',
+			options: [],
+			callback: async () => {
+				self.log('info', 'Refreshing scenes...')
+				await RefreshScenes(self)
+				self.updateActions()
 			},
 		},
 	}

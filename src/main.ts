@@ -14,6 +14,7 @@ import {
 	OneAreaDefinition,
 	BodyType,
 	FanSpeedType,
+	VirtualButtonDefinition,
 } from 'lutron-leap'
 import forge from 'node-forge'
 import { getDeviceLevelType, isPicoDevice, isFanDevice, getDeviceLabel } from './deviceTypes.js'
@@ -24,6 +25,7 @@ import {
 	type PicoButtonState,
 } from './picoButtons.js'
 import { BuildFanVariableDefinitions, SeedFanVariableValues } from './fans.js'
+import { RefreshScenes } from './scenes.js'
 
 const PAIRING_PORT = 8083
 const LEAP_PORT = 8081
@@ -45,6 +47,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	picoButtons: Record<string, PicoButtonState>
 	currentFanSpeed: Record<string, FanSpeedType>
 	fanVariableIds: Record<string, string>
+	scenes: Record<string, VirtualButtonDefinition>
 	isReconnecting: boolean
 	isDestroyed: boolean
 	healthCheckTimer?: ReturnType<typeof setInterval>
@@ -58,6 +61,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.lastNonZeroLevel = {}
 		this.discoveredPicoDevices = {}
 		this.picoButtons = {}
+		this.scenes = {}
 		this.currentFanSpeed = {}
 		this.fanVariableIds = {}
 		this.isReconnecting = false
@@ -315,6 +319,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 
 		await this.subscribeToDeviceStatuses()
 		await SubscribeToPicoButtons(this)
+		await RefreshScenes(this)
 
 		this.updateActions()
 		this.updateFeedbacks()
