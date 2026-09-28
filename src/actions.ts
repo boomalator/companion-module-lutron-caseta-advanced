@@ -72,6 +72,8 @@ function createLevelAction(
 							{ id: 'full', label: 'Full (100%)' },
 							{ id: 'off', label: 'Off' },
 							{ id: 'value', label: 'Specific Value' },
+							{ id: 'brighten', label: 'Brighten (+X%)' },
+							{ id: 'dim', label: 'Dim (-X%)' },
 						]
 					: [
 							{ id: 'on', label: 'On' },
@@ -90,6 +92,16 @@ function createLevelAction(
 			min: 0,
 			max: 100,
 			isVisible: (opts) => opts.mode === 'value',
+		})
+		options.push({
+			id: 'step_percent',
+			type: 'number',
+			label: 'Step Amount (%)',
+			range: true,
+			default: 10,
+			min: 1,
+			max: 100,
+			isVisible: (opts) => opts.mode === 'brighten' || opts.mode === 'dim',
 		})
 		options.push({
 			id: 'fade_time',
@@ -119,6 +131,18 @@ function createLevelAction(
 				case 'value':
 					level = event.options.brightness_value as number
 					break
+				case 'brighten': {
+					const current = self.currentLevel[device.SerialNumber] ?? 0
+					const step = (event.options.step_percent as number) || 10
+					level = Math.min(100, current + step)
+					break
+				}
+				case 'dim': {
+					const current = self.currentLevel[device.SerialNumber] ?? 100
+					const step = (event.options.step_percent as number) || 10
+					level = Math.max(0, current - step)
+					break
+				}
 				case 'on':
 				default:
 					level = levelType === 'dimmer' ? (self.lastNonZeroLevel[device.SerialNumber] ?? 100) : 100
