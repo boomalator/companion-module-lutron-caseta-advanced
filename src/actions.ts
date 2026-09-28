@@ -2,6 +2,7 @@ import { CompanionActionDefinition } from '@companion-module/base'
 import type { ModuleInstance } from './main.js'
 import { DeviceDefinition } from 'lutron-leap'
 import { getDeviceLevelType, getDeviceLabel, type DeviceLevelType } from './deviceTypes.js'
+import { BuildFanActions } from './fans.js'
 
 export function UpdateActions(self: ModuleInstance): void {
 	const entries = self.devicesOnBridge
@@ -21,6 +22,7 @@ export function UpdateActions(self: ModuleInstance): void {
 
 	self.setActionDefinitions({
 		...deviceActions,
+		...BuildFanActions(self),
 		...createSystemActions(self),
 	})
 }

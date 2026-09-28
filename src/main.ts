@@ -13,15 +13,17 @@ import {
 	DeviceDefinition,
 	OneAreaDefinition,
 	BodyType,
+	FanSpeedType,
 } from 'lutron-leap'
 import forge from 'node-forge'
-import { getDeviceLevelType, isPicoDevice, getDeviceLabel } from './deviceTypes.js'
+import { getDeviceLevelType, isPicoDevice, isFanDevice, getDeviceLabel } from './deviceTypes.js'
 import {
 	SubscribeToPicoButtons,
 	BuildPicoVariableDefinitions,
 	SeedPicoVariableValues,
 	type PicoButtonState,
 } from './picoButtons.js'
+import { BuildFanVariableDefinitions, SeedFanVariableValues } from './fans.js'
 
 const PAIRING_PORT = 8083
 const LEAP_PORT = 8081
@@ -41,6 +43,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	lastNonZeroLevel: Record<string, number>
 	discoveredPicoDevices: Record<string, string>
 	picoButtons: Record<string, PicoButtonState>
+	currentFanSpeed: Record<string, FanSpeedType>
+	fanVariableIds: Record<string, string>
 	isReconnecting: boolean
 	isDestroyed: boolean
 	healthCheckTimer?: ReturnType<typeof setInterval>
@@ -54,6 +58,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.lastNonZeroLevel = {}
 		this.discoveredPicoDevices = {}
 		this.picoButtons = {}
+		this.currentFanSpeed = {}
+		this.fanVariableIds = {}
 		this.isReconnecting = false
 		this.isDestroyed = false
 	}
@@ -380,7 +386,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		if (!bridge) return
 
 		const relevantDevices = this.devicesOnBridge.filter(
-			(device) => getDeviceLevelType(device) !== undefined || isPicoDevice(device),
+			(device) => getDeviceLevelType(device) !== undefined || isPicoDevice(device) || isFanDevice(device),
 		)
 
 		await Promise.all(
@@ -406,14 +412,22 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 
 				try {
 					const initial = await bridge.client.request('ReadRequest', statusHref)
-					this.handleZoneStatus(device, initial.Body)
+					if (isFanDevice(device)) {
+						this.handleFanStatus(device, initial.Body)
+					} else {
+						this.handleZoneStatus(device, initial.Body)
+					}
 				} catch (err) {
 					this.log('warn', `Failed to read status for ${device.Name}: ${(err as Error).message}`)
 				}
 
 				try {
 					await bridge.client.subscribe(statusHref, (resp) => {
-						this.handleZoneStatus(device, resp.Body)
+						if (isFanDevice(device)) {
+							this.handleFanStatus(device, resp.Body)
+						} else {
+							this.handleZoneStatus(device, resp.Body)
+						}
 					})
 				} catch (err) {
 					this.log('warn', `Failed to subscribe to status for ${device.Name}: ${(err as Error).message}`)
@@ -440,6 +454,18 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		}
 	}
 
+	handleFanStatus(device: DeviceDefinition, body: BodyType | undefined): void {
+		if (!body || !('ZoneStatus' in body)) return
+
+		const speed = body.ZoneStatus.FanSpeed
+		this.currentFanSpeed[device.SerialNumber] = speed
+
+		const variableId = this.fanVariableIds[device.SerialNumber]
+		if (variableId) {
+			this.setVariableValues({ [variableId]: speed })
+		}
+	}
+
 	// Return config fields for web config
 	getConfigFields(): SomeCompanionConfigField[] {
 		return GetConfigFields(this.discoveredBridges, this.discoveredPicoDevices)
@@ -456,9 +482,11 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	updateVariableDefinitions(): void {
 		const deviceVariables = BuildDeviceVariableDefinitions(this)
 		const picoVariables = BuildPicoVariableDefinitions(this)
-		this.setVariableDefinitions([...deviceVariables, ...picoVariables])
+		const fanVariables = BuildFanVariableDefinitions(this)
+		this.setVariableDefinitions([...deviceVariables, ...picoVariables, ...fanVariables])
 		SeedDeviceVariableValues(this)
 		SeedPicoVariableValues(this)
+		SeedFanVariableValues(this)
 	}
 }
 

@@ -11,6 +11,9 @@ const SWITCH_DEVICE_TYPES = ['WallSwitch', 'DivaSmartSwitch', 'OutdoorPlugInSwit
 // Pico remotes -- report button presses, no zone/level of their own
 const PICO_DEVICE_TYPES = ['Pico2Button', 'Pico3ButtonRaiseLower', 'Pico4ButtonScene']
 
+// Fan speed controllers -- zone status uses FanSpeed (5 discrete steps), not Level
+const FAN_DEVICE_TYPES = ['CasetaFanSpeedController']
+
 export function getDeviceLevelType(device: DeviceDefinition): DeviceLevelType | undefined {
 	if (DIMMER_DEVICE_TYPES.includes(device.DeviceType)) return 'dimmer'
 	if (SWITCH_DEVICE_TYPES.includes(device.DeviceType)) return 'switch'
@@ -19,6 +22,10 @@ export function getDeviceLevelType(device: DeviceDefinition): DeviceLevelType | 
 
 export function isPicoDevice(device: DeviceDefinition): boolean {
 	return PICO_DEVICE_TYPES.includes(device.DeviceType)
+}
+
+export function isFanDevice(device: DeviceDefinition): boolean {
+	return FAN_DEVICE_TYPES.includes(device.DeviceType)
 }
 
 // Shared by actions.ts (action name) and variables.ts (variable name), so the two
