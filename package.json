@@ -14,6 +14,10 @@
 		"lint": "run lint:raw ."
 	},
 	"license": "MIT",
+	"author": "Bear Cherian <bearcherian@gmail.com>",
+	"contributors": [
+		"B P Hynes <bph@byronetta.com>"
+	],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/boomalator/companion-module-lutron-caseta-advanced.git"
