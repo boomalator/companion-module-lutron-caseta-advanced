@@ -2,7 +2,7 @@ import type { ModuleInstance } from './main.js'
 import type { CompanionVariableDefinition, CompanionVariableValues } from '@companion-module/base'
 import { getDeviceLevelType, getDeviceLabel, slugify } from './deviceTypes.js'
 
-export function UpdateVariableDefinitions(self: ModuleInstance): void {
+export function BuildDeviceVariableDefinitions(self: ModuleInstance): CompanionVariableDefinition[] {
 	const entries = self.devicesOnBridge
 		.map((device) => {
 			const levelType = getDeviceLevelType(device)
@@ -29,12 +29,14 @@ export function UpdateVariableDefinitions(self: ModuleInstance): void {
 		variables.push({ variableId, name: label })
 	})
 
-	self.setVariableDefinitions(variables)
+	return variables
+}
 
-	// Seed values for any status already received (subscriptions are set up before
-	// this is called, so results may already be sitting in self.currentLevel).
+// Seed values for any status already received (subscriptions are set up before
+// this is called, so results may already be sitting in self.currentLevel).
+export function SeedDeviceVariableValues(self: ModuleInstance): void {
 	const initialValues: CompanionVariableValues = {}
-	entries.forEach(({ device }) => {
+	self.devicesOnBridge.forEach((device) => {
 		const level = self.currentLevel[device.SerialNumber]
 		const variableId = self.deviceVariableIds[device.SerialNumber]
 		if (level !== undefined && variableId) {

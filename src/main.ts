@@ -1,6 +1,6 @@
 import { InstanceBase, runEntrypoint, InstanceStatus, SomeCompanionConfigField } from '@companion-module/base'
 import { GetConfigFields, type ModuleConfig, type ModuleSecrets } from './config.js'
-import { UpdateVariableDefinitions } from './variables.js'
+import { BuildDeviceVariableDefinitions, SeedDeviceVariableValues } from './variables.js'
 import { UpgradeScripts } from './upgrades.js'
 import { UpdateActions } from './actions.js'
 import { UpdateFeedbacks } from './feedbacks.js'
@@ -15,7 +15,13 @@ import {
 	BodyType,
 } from 'lutron-leap'
 import forge from 'node-forge'
-import { getDeviceLevelType } from './deviceTypes.js'
+import { getDeviceLevelType, isPicoDevice, getDeviceLabel } from './deviceTypes.js'
+import {
+	SubscribeToPicoButtons,
+	BuildPicoVariableDefinitions,
+	SeedPicoVariableValues,
+	type PicoButtonState,
+} from './picoButtons.js'
 
 const PAIRING_PORT = 8083
 const LEAP_PORT = 8081
@@ -31,6 +37,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	deviceVariableIds: Record<string, string>
 	currentLevel: Record<string, number>
 	lastNonZeroLevel: Record<string, number>
+	discoveredPicoDevices: Record<string, string>
+	picoButtons: Record<string, PicoButtonState>
 	constructor(internal: unknown) {
 		super(internal)
 		this.discoveredBridges = {}
@@ -39,6 +47,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.deviceVariableIds = {}
 		this.currentLevel = {}
 		this.lastNonZeroLevel = {}
+		this.discoveredPicoDevices = {}
+		this.picoButtons = {}
 	}
 
 	async init(config: ModuleConfig, _isFirstInit: boolean, secrets: ModuleSecrets): Promise<void> {
@@ -182,7 +192,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.secrets = secrets
 		// this.log('debug', `New config: ${JSON.stringify(this.config)}`)
 		this.log('debug', this.config.host !== prevConfig.host ? 'host changed' : 'host unchanged')
-		if (this.config.host !== prevConfig.host) {
+		const hostChanged = this.config.host !== prevConfig.host
+		if (hostChanged) {
 			// host changed, need to re-pair
 			this.updateStatus(InstanceStatus.Connecting, 'Pairing with Bridge')
 			this.log('info', 'pairing...')
@@ -190,6 +201,22 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		}
 
 		this.saveConfig(this.config, this.secrets)
+
+		// Changing which Picos to monitor doesn't need a full bridge teardown and
+		// device rediscovery -- that was slow enough (with ~60 devices) to trip
+		// Companion's config-save timeout. Just re-subscribe to buttons instead.
+		const onlyPicoSelectionChanged =
+			!hostChanged &&
+			this.bridge !== undefined &&
+			prevConfig.bridgeID === this.config.bridgeID &&
+			JSON.stringify(prevConfig.picoDeviceIds ?? []) !== JSON.stringify(this.config.picoDeviceIds ?? [])
+		if (onlyPicoSelectionChanged) {
+			this.log('debug', 'Pico selection changed, re-subscribing without a full reconnect')
+			await SubscribeToPicoButtons(this)
+			this.updateVariableDefinitions()
+			return
+		}
+
 		this.log('debug', 're-initializing module')
 		await this.init(this.config, false, this.secrets)
 	}
@@ -243,18 +270,22 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.log('debug', 'Loaded')
 
 		await this.subscribeToDeviceStatuses()
+		await SubscribeToPicoButtons(this)
 
 		this.updateStatus(InstanceStatus.Ok)
 	}
 
-	// Fetch each dimmer/switch's area name (for labeling) and current level, then
+	// Fetch each dimmer/switch/Pico's area name (for labeling) and current level, then
 	// subscribe to live status pushes so brightness stays accurate as it changes
-	// from any source (physical paddle, Lutron app, other integrations, etc).
+	// from any source (physical paddle, Lutron app, other integrations, etc). Also
+	// records discovered Pico remotes so config can offer them for selection.
 	async subscribeToDeviceStatuses(): Promise<void> {
 		const bridge = this.bridge
 		if (!bridge) return
 
-		const relevantDevices = this.devicesOnBridge.filter((device) => getDeviceLevelType(device) !== undefined)
+		const relevantDevices = this.devicesOnBridge.filter(
+			(device) => getDeviceLevelType(device) !== undefined || isPicoDevice(device),
+		)
 
 		await Promise.all(
 			relevantDevices.map(async (device) => {
@@ -263,6 +294,14 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 					this.deviceAreaNames[device.SerialNumber] = (areaResponse as OneAreaDefinition).Area.Name
 				} catch (err) {
 					this.log('error', `Error getting area for device ${device.Name}: ${(err as Error).message}`)
+				}
+
+				if (isPicoDevice(device)) {
+					this.discoveredPicoDevices[device.SerialNumber] = getDeviceLabel(
+						this.deviceAreaNames[device.SerialNumber] ?? '',
+						device,
+					)
+					return // Picos have no zone/level status to read
 				}
 
 				const zone = device.LocalZones[0]
@@ -307,7 +346,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 
 	// Return config fields for web config
 	getConfigFields(): SomeCompanionConfigField[] {
-		return GetConfigFields(this.discoveredBridges)
+		return GetConfigFields(this.discoveredBridges, this.discoveredPicoDevices)
 	}
 
 	updateActions(): void {
@@ -319,7 +358,11 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	}
 
 	updateVariableDefinitions(): void {
-		UpdateVariableDefinitions(this)
+		const deviceVariables = BuildDeviceVariableDefinitions(this)
+		const picoVariables = BuildPicoVariableDefinitions(this)
+		this.setVariableDefinitions([...deviceVariables, ...picoVariables])
+		SeedDeviceVariableValues(this)
+		SeedPicoVariableValues(this)
 	}
 }
 

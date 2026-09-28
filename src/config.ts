@@ -4,6 +4,7 @@ export interface ModuleConfig {
 	host: string
 	port: number
 	bridgeID?: string
+	picoDeviceIds?: string[]
 }
 
 export interface ModuleSecrets {
@@ -16,7 +17,10 @@ export interface BridgeCerts {
 	privateKey: string
 }
 
-export function GetConfigFields(discoveredBridges: Record<string, string>): SomeCompanionConfigField[] {
+export function GetConfigFields(
+	discoveredBridges: Record<string, string>,
+	discoveredPicoDevices: Record<string, string>,
+): SomeCompanionConfigField[] {
 	return [
 		{
 			type: 'static-text',
@@ -39,5 +43,17 @@ export function GetConfigFields(discoveredBridges: Record<string, string>): Some
 			regex: Regex.IP,
 			allowCustom: true,
 		} as SomeCompanionConfigField, // type assertion because description isn't in the base type definition
+		{
+			type: 'multidropdown',
+			id: 'picoDeviceIds',
+			label: 'Pico Remotes to Monitor',
+			width: 8,
+			description:
+				'Select which Pico remotes should have their button presses exposed as variables. This list only populates after connecting once, so pair first, save, then come back to pick Picos.',
+			choices: Object.entries(discoveredPicoDevices)
+				.map(([serial, label]) => ({ id: serial, label }))
+				.sort((a, b) => a.label.localeCompare(b.label)),
+			default: [],
+		} as SomeCompanionConfigField,
 	]
 }

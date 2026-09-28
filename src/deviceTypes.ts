@@ -8,10 +8,17 @@ const DIMMER_DEVICE_TYPES = ['WallDimmer', 'DivaSmartDimmer', 'PlugInDimmer']
 // Devices whose zone Level is only ever 0 or 100
 const SWITCH_DEVICE_TYPES = ['WallSwitch', 'DivaSmartSwitch', 'OutdoorPlugInSwitch']
 
+// Pico remotes -- report button presses, no zone/level of their own
+const PICO_DEVICE_TYPES = ['Pico2Button', 'Pico3ButtonRaiseLower', 'Pico4ButtonScene']
+
 export function getDeviceLevelType(device: DeviceDefinition): DeviceLevelType | undefined {
 	if (DIMMER_DEVICE_TYPES.includes(device.DeviceType)) return 'dimmer'
 	if (SWITCH_DEVICE_TYPES.includes(device.DeviceType)) return 'switch'
 	return undefined
+}
+
+export function isPicoDevice(device: DeviceDefinition): boolean {
+	return PICO_DEVICE_TYPES.includes(device.DeviceType)
 }
 
 // Shared by actions.ts (action name) and variables.ts (variable name), so the two
