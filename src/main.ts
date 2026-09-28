@@ -26,6 +26,8 @@ import {
 const PAIRING_PORT = 8083
 const LEAP_PORT = 8081
 const UNKNOWN_BRIDGE_ID = 'unknown-bridge-id'
+const HEALTH_CHECK_INTERVAL_MS = 120000 // 2 minutes
+const HEALTH_CHECK_TIMEOUT_MS = 8000
 
 export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	config!: ModuleConfig // Setup in init()
@@ -39,6 +41,9 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	lastNonZeroLevel: Record<string, number>
 	discoveredPicoDevices: Record<string, string>
 	picoButtons: Record<string, PicoButtonState>
+	isReconnecting: boolean
+	isDestroyed: boolean
+	healthCheckTimer?: ReturnType<typeof setInterval>
 	constructor(internal: unknown) {
 		super(internal)
 		this.discoveredBridges = {}
@@ -49,6 +54,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.lastNonZeroLevel = {}
 		this.discoveredPicoDevices = {}
 		this.picoButtons = {}
+		this.isReconnecting = false
+		this.isDestroyed = false
 	}
 
 	async init(config: ModuleConfig, _isFirstInit: boolean, secrets: ModuleSecrets): Promise<void> {
@@ -181,6 +188,11 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	// When module gets deleted
 	async destroy(): Promise<void> {
 		this.log('debug', 'destroy')
+		// Set before close() -- closing the socket fires the bridge's own
+		// 'disconnected' event, which would otherwise kick off a reconnect attempt
+		// on a module that's being torn down.
+		this.isDestroyed = true
+		this.stopHealthCheck()
 		this.bridge?.close()
 	}
 
@@ -231,13 +243,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.log('debug', 'Connecting to bridge with id: ' + this.config.bridgeID)
 		this.updateStatus(InstanceStatus.Connecting, 'Connecting to Bridge')
 
-		const leapClient = new LeapClient(
-			this.config.host,
-			LEAP_PORT,
-			this.secrets.bridgeCerts.ca,
-			this.secrets.bridgeCerts.privateKey,
-			this.secrets.bridgeCerts.certificate,
-		)
+		const leapClient = this.createLeapClient()
 
 		try {
 			await leapClient.connect()
@@ -248,9 +254,41 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		}
 
 		this.bridge = new SmartBridge(this.config.bridgeID, leapClient)
+		// Fires on a real dropped connection, and again (by the library's own
+		// design) after a successful reconfigureBridge() call -- handleBridgeDisconnected
+		// guards against treating that second case as a fresh disconnect.
+		this.bridge.on('disconnected', () => {
+			if (this.isDestroyed) return
+			void this.handleBridgeDisconnected()
+		})
 
-		// load devices
-		const devices = await this.bridge.getDeviceInfo()
+		await this.rescanDevices()
+
+		this.updateStatus(InstanceStatus.Ok)
+		this.startHealthCheck()
+	}
+
+	createLeapClient(): LeapClient {
+		return new LeapClient(
+			this.config.host,
+			LEAP_PORT,
+			this.secrets.bridgeCerts!.ca,
+			this.secrets.bridgeCerts!.privateKey,
+			this.secrets.bridgeCerts!.certificate,
+		)
+	}
+
+	// Re-fetches the device list and re-subscribes to everything. Used for the
+	// initial connect, after a reconnect, and by the "Rescan Devices" action (e.g.
+	// after adding a new Pico in the Lutron app -- the device list is only ever
+	// read once per connection, not polled).
+	async rescanDevices(): Promise<void> {
+		const bridge = this.bridge
+		if (!bridge) return
+
+		this.devicesOnBridge = []
+
+		const devices = await bridge.getDeviceInfo()
 		devices.forEach((device) => {
 			if (device instanceof Error) {
 				this.log('error', `Error retrieving device: ${device.message}`)
@@ -272,7 +310,65 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		await this.subscribeToDeviceStatuses()
 		await SubscribeToPicoButtons(this)
 
-		this.updateStatus(InstanceStatus.Ok)
+		this.updateActions()
+		this.updateFeedbacks()
+		this.updateVariableDefinitions()
+	}
+
+	// Handles both a genuine dropped connection and the "zombie connection" case
+	// (socket still open but not actually working) caught by the health check.
+	async handleBridgeDisconnected(): Promise<void> {
+		if (this.isReconnecting || this.isDestroyed) return
+		if (!this.bridge || !this.secrets.bridgeCerts) return
+
+		this.isReconnecting = true
+		this.stopHealthCheck()
+		this.log('warn', 'Bridge connection lost, attempting to reconnect')
+		this.updateStatus(InstanceStatus.Connecting, 'Reconnecting to bridge')
+
+		try {
+			await this.bridge.reconfigureBridge(this.createLeapClient())
+			this.log('info', 'Reconnected to bridge, re-subscribing')
+			await this.rescanDevices()
+			this.updateStatus(InstanceStatus.Ok)
+			this.startHealthCheck()
+		} catch (err) {
+			this.log('error', `Failed to reconnect to bridge: ${(err as Error).message}`)
+			this.updateStatus(InstanceStatus.ConnectionFailure, 'Reconnect failed')
+		} finally {
+			this.isReconnecting = false
+		}
+	}
+
+	startHealthCheck(): void {
+		this.stopHealthCheck()
+		this.healthCheckTimer = setInterval(() => {
+			void this.checkBridgeHealth()
+		}, HEALTH_CHECK_INTERVAL_MS)
+	}
+
+	stopHealthCheck(): void {
+		if (this.healthCheckTimer) {
+			clearInterval(this.healthCheckTimer)
+			this.healthCheckTimer = undefined
+		}
+	}
+
+	// Backstop for a connection that looks open but has actually gone stale (common
+	// over flaky WiFi/NAT) -- the bridge's own disconnect event only fires on a
+	// clean TCP close, which a zombie connection won't produce on its own.
+	async checkBridgeHealth(): Promise<void> {
+		if (!this.bridge || this.isReconnecting || this.isDestroyed) return
+
+		try {
+			await Promise.race([
+				this.bridge.ping(),
+				new Promise((_resolve, reject) => setTimeout(() => reject(new Error('timed out')), HEALTH_CHECK_TIMEOUT_MS)),
+			])
+		} catch (err) {
+			this.log('warn', `Bridge health check failed: ${(err as Error).message}`)
+			void this.handleBridgeDisconnected()
+		}
 	}
 
 	// Fetch each dimmer/switch/Pico's area name (for labeling) and current level, then
