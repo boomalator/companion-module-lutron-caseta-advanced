@@ -5,6 +5,11 @@ import { getDeviceLevelType, getDeviceLabel, type DeviceLevelType } from './devi
 import { BuildFanActions } from './fans.js'
 import { BuildSceneActions, RefreshScenes } from './scenes.js'
 
+// Used when we genuinely have no live reading yet for a dimmer (e.g. right at
+// startup, before its first status has arrived) -- a light should still turn on to
+// *something* usable rather than snapping to full brightness or staying dark.
+const DEFAULT_UNKNOWN_BRIGHTNESS = 65
+
 export function UpdateActions(self: ModuleInstance): void {
 	const entries = self.devicesOnBridge
 		.map((device) => {
@@ -143,20 +148,21 @@ function createLevelAction(
 					level = event.options.brightness_value as number
 					break
 				case 'brighten': {
-					const current = self.currentLevel[device.SerialNumber] ?? 0
+					const current = self.currentLevel[device.SerialNumber] ?? DEFAULT_UNKNOWN_BRIGHTNESS
 					const step = (event.options.step_percent as number) || 10
 					level = Math.min(100, current + step)
 					break
 				}
 				case 'dim': {
-					const current = self.currentLevel[device.SerialNumber] ?? 100
+					const current = self.currentLevel[device.SerialNumber] ?? DEFAULT_UNKNOWN_BRIGHTNESS
 					const step = (event.options.step_percent as number) || 10
 					level = Math.max(0, current - step)
 					break
 				}
 				case 'on':
 				default:
-					level = levelType === 'dimmer' ? (self.lastNonZeroLevel[device.SerialNumber] ?? 100) : 100
+					level =
+						levelType === 'dimmer' ? (self.lastNonZeroLevel[device.SerialNumber] ?? DEFAULT_UNKNOWN_BRIGHTNESS) : 100
 			}
 
 			// fade time input is in seconds but needs to be formatted for the API. So 1.75 seconds becomes "00:00:01.7500"
