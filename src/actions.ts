@@ -1,52 +1,52 @@
 import { CompanionActionDefinition } from '@companion-module/base'
 import type { ModuleInstance } from './main.js'
-import { DeviceDefinition, OneAreaDefinition } from 'lutron-leap'
+import { DeviceDefinition } from 'lutron-leap'
+import { getDeviceLevelType, type DeviceLevelType } from './deviceTypes.js'
 
-export async function UpdateActions(self: ModuleInstance): Promise<void> {
+export function UpdateActions(self: ModuleInstance): void {
 	const deviceActions: Record<string, CompanionActionDefinition> = {}
 
-	await Promise.all(
-		self.devicesOnBridge.map(async (device) => {
-			try {
-				const response = await self.bridge?.getHref(device.AssociatedArea)
+	self.devicesOnBridge.forEach((device) => {
+		const levelType = getDeviceLevelType(device)
+		if (!levelType) return
 
-				const areaName = (response as OneAreaDefinition).Area.Name
-				self.log('debug', `creating actions for ${areaName} ${device.Name}`)
-				const deviceKeyName = device.SerialNumber
-				if (
-					device.DeviceType === 'WallSwitch' ||
-					device.DeviceType === 'WallDimmer' ||
-					device.DeviceType === 'DivaSmartDimmer'
-				) {
-					deviceActions[`${deviceKeyName}_turn_on`] = createDimmerAction(self, areaName, device, 'on')
-					deviceActions[`${deviceKeyName}_turn_off`] = createDimmerAction(self, areaName, device, 'off')
-				}
-				if (device.DeviceType === 'WallDimmer' || device.DeviceType === 'DivaSmartDimmer') {
-					deviceActions[`${deviceKeyName}_set_brightness`] = createDimmerAction(self, areaName, device, 'brightness')
-				}
-			} catch (err) {
-				self.log('error', `Error getting area for device ${device.Name}: ${(err as Error).message}`)
-			}
-		}),
-	)
+		const areaName = self.deviceAreaNames[device.SerialNumber] ?? ''
+		deviceActions[`${device.SerialNumber}_set_level`] = createLevelAction(self, areaName, device, levelType)
+	})
 
 	self.setActionDefinitions({
 		...deviceActions,
 	})
 }
 
-function createDimmerAction(
+function createLevelAction(
 	self: ModuleInstance,
 	areaName: string,
 	device: DeviceDefinition,
-	actionType: 'on' | 'off' | 'brightness',
+	levelType: DeviceLevelType,
 ): CompanionActionDefinition {
-	const isOnOff = actionType === 'on' || actionType === 'off'
-	const fixedLevel = actionType === 'on' ? 100 : actionType === 'off' ? 0 : undefined
+	const options: CompanionActionDefinition['options'] = [
+		{
+			id: 'mode',
+			type: 'dropdown',
+			label: 'Action',
+			default: 'on',
+			choices:
+				levelType === 'dimmer'
+					? [
+							{ id: 'on', label: 'On (Resume Last Level)' },
+							{ id: 'full', label: 'Full (100%)' },
+							{ id: 'off', label: 'Off' },
+							{ id: 'value', label: 'Specific Value' },
+						]
+					: [
+							{ id: 'on', label: 'On' },
+							{ id: 'off', label: 'Off' },
+						],
+		},
+	]
 
-	const options: CompanionActionDefinition['options'] = []
-
-	if (!isOnOff) {
+	if (levelType === 'dimmer') {
 		options.push({
 			id: 'brightness_value',
 			type: 'number',
@@ -55,28 +55,43 @@ function createDimmerAction(
 			default: 50,
 			min: 0,
 			max: 100,
+			isVisible: (opts) => opts.mode === 'value',
+		})
+		options.push({
+			id: 'fade_time',
+			type: 'number',
+			label: 'Fade Time (seconds)',
+			default: 4,
+			min: 0,
+			max: 10,
+			step: 0.25,
+			range: true,
 		})
 	}
 
-	options.push({
-		id: 'fade_time',
-		type: 'number',
-		label: 'Fade Time (seconds)',
-		default: 4,
-		min: 0,
-		max: 10,
-		step: 0.25,
-		range: true,
-	})
-
 	return {
-		name: `${areaName} ${device.Name}: ${actionType === 'on' ? 'Turn On' : actionType === 'off' ? 'Turn Off' : 'Set Brightness'}`,
+		name: `${areaName} ${device.Name}: Set Level`,
 		options,
 		callback: async (event) => {
-			const level = isOnOff ? fixedLevel : (event.options.brightness_value as number)
+			const mode = event.options.mode as string
+			let level: number
+			switch (mode) {
+				case 'off':
+					level = 0
+					break
+				case 'full':
+					level = 100
+					break
+				case 'value':
+					level = event.options.brightness_value as number
+					break
+				case 'on':
+				default:
+					level = levelType === 'dimmer' ? (self.lastNonZeroLevel[device.SerialNumber] ?? 100) : 100
+			}
 
 			// fade time input is in seconds but needs to be formatted for the API. So 1.75 seconds becomes "00:00:01.7500"
-			const fadeTimeValue = (event.options.fade_time as number) || 0
+			const fadeTimeValue = levelType === 'dimmer' ? (event.options.fade_time as number) || 0 : 0
 			const fadeTimeFormatted = `00:00:${Math.floor(fadeTimeValue).toString().padStart(2, '0')}.${((fadeTimeValue % 1) * 10000).toFixed(0).padStart(4, '0')}`
 
 			try {
@@ -99,7 +114,7 @@ function createDimmerAction(
 					)
 				}
 			} catch (err) {
-				self.log('error', `Error setting ${device.Name} ${actionType || 'brightness'}: ${(err as Error).message}`)
+				self.log('error', `Error setting ${device.Name}: ${(err as Error).message}`)
 			}
 		},
 	}

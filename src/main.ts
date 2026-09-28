@@ -4,8 +4,18 @@ import { UpdateVariableDefinitions } from './variables.js'
 import { UpgradeScripts } from './upgrades.js'
 import { UpdateActions } from './actions.js'
 import { UpdateFeedbacks } from './feedbacks.js'
-import { PairingClient, BridgeFinder, BridgeNetInfo, LeapClient, SmartBridge, DeviceDefinition } from 'lutron-leap'
+import {
+	PairingClient,
+	BridgeFinder,
+	BridgeNetInfo,
+	LeapClient,
+	SmartBridge,
+	DeviceDefinition,
+	OneAreaDefinition,
+	BodyType,
+} from 'lutron-leap'
 import forge from 'node-forge'
+import { getDeviceLevelType } from './deviceTypes.js'
 
 const PAIRING_PORT = 8083
 const LEAP_PORT = 8081
@@ -17,10 +27,16 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	discoveredBridges: Record<string, string>
 	bridge?: SmartBridge
 	devicesOnBridge: DeviceDefinition[]
+	deviceAreaNames: Record<string, string>
+	currentLevel: Record<string, number>
+	lastNonZeroLevel: Record<string, number>
 	constructor(internal: unknown) {
 		super(internal)
 		this.discoveredBridges = {}
 		this.devicesOnBridge = []
+		this.deviceAreaNames = {}
+		this.currentLevel = {}
+		this.lastNonZeroLevel = {}
 	}
 
 	async init(config: ModuleConfig, _isFirstInit: boolean, secrets: ModuleSecrets): Promise<void> {
@@ -37,7 +53,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 			await this.connectToBridge()
 		}
 
-		await this.updateActions() // export actions
+		this.updateActions() // export actions
 		this.updateFeedbacks() // export feedbacks
 		this.updateVariableDefinitions() // export variable definitions
 	}
@@ -223,7 +239,61 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		})
 
 		this.log('debug', 'Loaded')
+
+		await this.subscribeToDeviceStatuses()
+
 		this.updateStatus(InstanceStatus.Ok)
+	}
+
+	// Fetch each dimmer/switch's area name (for labeling) and current level, then
+	// subscribe to live status pushes so brightness stays accurate as it changes
+	// from any source (physical paddle, Lutron app, other integrations, etc).
+	async subscribeToDeviceStatuses(): Promise<void> {
+		const bridge = this.bridge
+		if (!bridge) return
+
+		const relevantDevices = this.devicesOnBridge.filter((device) => getDeviceLevelType(device) !== undefined)
+
+		await Promise.all(
+			relevantDevices.map(async (device) => {
+				try {
+					const areaResponse = await bridge.getHref(device.AssociatedArea)
+					this.deviceAreaNames[device.SerialNumber] = (areaResponse as OneAreaDefinition).Area.Name
+				} catch (err) {
+					this.log('error', `Error getting area for device ${device.Name}: ${(err as Error).message}`)
+				}
+
+				const zone = device.LocalZones[0]
+				if (!zone) return
+				const statusHref = `${zone.href}/status`
+
+				try {
+					const initial = await bridge.client.request('ReadRequest', statusHref)
+					this.handleZoneStatus(device, initial.Body)
+				} catch (err) {
+					this.log('warn', `Failed to read status for ${device.Name}: ${(err as Error).message}`)
+				}
+
+				try {
+					await bridge.client.subscribe(statusHref, (resp) => {
+						this.handleZoneStatus(device, resp.Body)
+					})
+				} catch (err) {
+					this.log('warn', `Failed to subscribe to status for ${device.Name}: ${(err as Error).message}`)
+				}
+			}),
+		)
+	}
+
+	handleZoneStatus(device: DeviceDefinition, body: BodyType | undefined): void {
+		if (!body || !('ZoneStatus' in body)) return
+
+		const level = body.ZoneStatus.Level
+		this.currentLevel[device.SerialNumber] = level
+		if (level > 0) {
+			this.lastNonZeroLevel[device.SerialNumber] = level
+		}
+		this.setVariableValues({ [`brightness_${device.SerialNumber}`]: level })
 	}
 
 	// Return config fields for web config
@@ -231,8 +301,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		return GetConfigFields(this.discoveredBridges)
 	}
 
-	async updateActions(): Promise<void> {
-		await UpdateActions(this)
+	updateActions(): void {
+		UpdateActions(this)
 	}
 
 	updateFeedbacks(): void {
