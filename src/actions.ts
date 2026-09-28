@@ -1,17 +1,22 @@
 import { CompanionActionDefinition } from '@companion-module/base'
 import type { ModuleInstance } from './main.js'
 import { DeviceDefinition } from 'lutron-leap'
-import { getDeviceLevelType, type DeviceLevelType } from './deviceTypes.js'
+import { getDeviceLevelType, getDeviceLabel, type DeviceLevelType } from './deviceTypes.js'
 
 export function UpdateActions(self: ModuleInstance): void {
+	const entries = self.devicesOnBridge
+		.map((device) => {
+			const levelType = getDeviceLevelType(device)
+			if (!levelType) return undefined
+			const label = getDeviceLabel(self.deviceAreaNames[device.SerialNumber] ?? '', device)
+			return { device, levelType, label }
+		})
+		.filter((entry) => entry !== undefined)
+		.sort((a, b) => a.label.localeCompare(b.label))
+
 	const deviceActions: Record<string, CompanionActionDefinition> = {}
-
-	self.devicesOnBridge.forEach((device) => {
-		const levelType = getDeviceLevelType(device)
-		if (!levelType) return
-
-		const areaName = self.deviceAreaNames[device.SerialNumber] ?? ''
-		deviceActions[`${device.SerialNumber}_set_level`] = createLevelAction(self, areaName, device, levelType)
+	entries.forEach(({ device, levelType, label }) => {
+		deviceActions[`${device.SerialNumber}_set_level`] = createLevelAction(self, label, device, levelType)
 	})
 
 	self.setActionDefinitions({
@@ -21,7 +26,7 @@ export function UpdateActions(self: ModuleInstance): void {
 
 function createLevelAction(
 	self: ModuleInstance,
-	areaName: string,
+	label: string,
 	device: DeviceDefinition,
 	levelType: DeviceLevelType,
 ): CompanionActionDefinition {
@@ -29,7 +34,7 @@ function createLevelAction(
 		{
 			id: 'mode',
 			type: 'dropdown',
-			label: 'Action',
+			label: levelType === 'dimmer' ? 'Control' : 'State',
 			default: 'on',
 			choices:
 				levelType === 'dimmer'
@@ -70,7 +75,7 @@ function createLevelAction(
 	}
 
 	return {
-		name: `${areaName} ${device.Name}: Set Level`,
+		name: label,
 		options,
 		callback: async (event) => {
 			const mode = event.options.mode as string

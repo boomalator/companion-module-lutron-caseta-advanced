@@ -28,6 +28,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	bridge?: SmartBridge
 	devicesOnBridge: DeviceDefinition[]
 	deviceAreaNames: Record<string, string>
+	deviceVariableIds: Record<string, string>
 	currentLevel: Record<string, number>
 	lastNonZeroLevel: Record<string, number>
 	constructor(internal: unknown) {
@@ -35,6 +36,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.discoveredBridges = {}
 		this.devicesOnBridge = []
 		this.deviceAreaNames = {}
+		this.deviceVariableIds = {}
 		this.currentLevel = {}
 		this.lastNonZeroLevel = {}
 	}
@@ -293,7 +295,14 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		if (level > 0) {
 			this.lastNonZeroLevel[device.SerialNumber] = level
 		}
-		this.setVariableValues({ [`brightness_${device.SerialNumber}`]: level })
+
+		// Variable IDs aren't assigned until updateVariableDefinitions() runs later in
+		// init(); status received before then is still recorded above and gets seeded
+		// once definitions are built.
+		const variableId = this.deviceVariableIds[device.SerialNumber]
+		if (variableId) {
+			this.setVariableValues({ [variableId]: level })
+		}
 	}
 
 	// Return config fields for web config

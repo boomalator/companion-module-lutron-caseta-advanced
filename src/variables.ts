@@ -1,18 +1,31 @@
 import type { ModuleInstance } from './main.js'
 import type { CompanionVariableDefinition, CompanionVariableValues } from '@companion-module/base'
-import { getDeviceLevelType } from './deviceTypes.js'
+import { getDeviceLevelType, getDeviceLabel, slugify } from './deviceTypes.js'
 
 export function UpdateVariableDefinitions(self: ModuleInstance): void {
-	const variables: CompanionVariableDefinition[] = []
-
-	self.devicesOnBridge.forEach((device) => {
-		if (!getDeviceLevelType(device)) return
-
-		const areaName = self.deviceAreaNames[device.SerialNumber] ?? ''
-		variables.push({
-			variableId: `brightness_${device.SerialNumber}`,
-			name: `${areaName} ${device.Name} Brightness`.trim(),
+	const entries = self.devicesOnBridge
+		.map((device) => {
+			if (!getDeviceLevelType(device)) return undefined
+			const label = getDeviceLabel(self.deviceAreaNames[device.SerialNumber] ?? '', device)
+			return { device, label }
 		})
+		.filter((entry) => entry !== undefined)
+		.sort((a, b) => a.label.localeCompare(b.label))
+
+	const variables: CompanionVariableDefinition[] = []
+	const usedIds = new Set<string>()
+
+	self.deviceVariableIds = {}
+	entries.forEach(({ device, label }) => {
+		let variableId = `brightness_${slugify(label)}`
+		if (usedIds.has(variableId)) {
+			// disambiguate the rare case of two devices sharing the same area+name
+			variableId = `${variableId}_${device.SerialNumber}`
+		}
+		usedIds.add(variableId)
+
+		self.deviceVariableIds[device.SerialNumber] = variableId
+		variables.push({ variableId, name: label })
 	})
 
 	self.setVariableDefinitions(variables)
@@ -20,10 +33,11 @@ export function UpdateVariableDefinitions(self: ModuleInstance): void {
 	// Seed values for any status already received (subscriptions are set up before
 	// this is called, so results may already be sitting in self.currentLevel).
 	const initialValues: CompanionVariableValues = {}
-	self.devicesOnBridge.forEach((device) => {
+	entries.forEach(({ device }) => {
 		const level = self.currentLevel[device.SerialNumber]
-		if (level !== undefined) {
-			initialValues[`brightness_${device.SerialNumber}`] = level
+		const variableId = self.deviceVariableIds[device.SerialNumber]
+		if (level !== undefined && variableId) {
+			initialValues[variableId] = level
 		}
 	})
 	self.setVariableValues(initialValues)
