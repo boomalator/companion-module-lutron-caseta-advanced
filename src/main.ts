@@ -32,6 +32,12 @@ import {
 } from './picoButtons.js'
 import { BuildFanVariableDefinitions, SeedFanVariableValues, FAN_SPEED_PERCENT } from './fans.js'
 import { RefreshScenes } from './scenes.js'
+import {
+	SubscribeToOccupancy,
+	BuildOccupancyVariableDefinitions,
+	SeedOccupancyVariableValues,
+	type OccupancySensorState,
+} from './occupancy.js'
 
 const PAIRING_PORT = 8083
 const LEAP_PORT = 8081
@@ -55,6 +61,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	fanVariableIds: Record<string, string>
 	fanPercentVariableIds: Record<string, string>
 	scenes: Record<string, VirtualButtonDefinition>
+	occupancySensors: Record<string, OccupancySensorState>
+	occupancyGroupToDevices: Record<string, string[]>
 	isReconnecting: boolean
 	isDestroyed: boolean
 	healthCheckTimer?: ReturnType<typeof setInterval>
@@ -72,6 +80,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.currentFanSpeed = {}
 		this.fanVariableIds = {}
 		this.fanPercentVariableIds = {}
+		this.occupancySensors = {}
+		this.occupancyGroupToDevices = {}
 		this.isReconnecting = false
 		this.isDestroyed = false
 	}
@@ -284,6 +294,20 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 
 		this.updateStatus(InstanceStatus.Ok)
 		this.startHealthCheck()
+
+		// Scenes and occupancy involve dozens of extra round trips (12 scenes +
+		// 25 occupancy groups on this bridge) -- awaiting them before reporting Ok
+		// pushed init() past Companion's own IPC timeout, causing a "Restart forced"
+		// crash loop even though the connection itself was fine. Backgrounding them
+		// means the connection comes up fast; these two lists populate a moment later.
+		void this.refreshSlowExtras()
+	}
+
+	async refreshSlowExtras(): Promise<void> {
+		await RefreshScenes(this)
+		await SubscribeToOccupancy(this)
+		this.updateActions()
+		this.updateVariableDefinitions()
 	}
 
 	createLeapClient(): LeapClient {
@@ -327,7 +351,6 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 
 		await this.subscribeToDeviceStatuses()
 		await SubscribeToPicoButtons(this)
-		await RefreshScenes(this)
 
 		this.updateActions()
 		this.updateFeedbacks()
@@ -351,6 +374,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 			await this.rescanDevices()
 			this.updateStatus(InstanceStatus.Ok)
 			this.startHealthCheck()
+			void this.refreshSlowExtras()
 		} catch (err) {
 			this.log('error', `Failed to reconnect to bridge: ${(err as Error).message}`)
 			this.updateStatus(InstanceStatus.ConnectionFailure, 'Reconnect failed')
@@ -500,10 +524,12 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		const deviceVariables = BuildDeviceVariableDefinitions(this)
 		const picoVariables = BuildPicoVariableDefinitions(this)
 		const fanVariables = BuildFanVariableDefinitions(this)
-		this.setVariableDefinitions([...deviceVariables, ...picoVariables, ...fanVariables])
+		const occupancyVariables = BuildOccupancyVariableDefinitions(this)
+		this.setVariableDefinitions([...deviceVariables, ...picoVariables, ...fanVariables, ...occupancyVariables])
 		SeedDeviceVariableValues(this)
 		SeedPicoVariableValues(this)
 		SeedFanVariableValues(this)
+		SeedOccupancyVariableValues(this)
 	}
 }
 

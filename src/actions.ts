@@ -44,6 +44,7 @@ function createSystemActions(self: ModuleInstance): Record<string, CompanionActi
 				self.log('info', 'Rescanning devices...')
 				try {
 					await self.rescanDevices()
+					await self.refreshSlowExtras()
 				} catch (err) {
 					self.log('error', `Rescan failed: ${(err as Error).message}`)
 				}
