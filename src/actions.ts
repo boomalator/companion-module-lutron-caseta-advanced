@@ -21,7 +21,34 @@ export function UpdateActions(self: ModuleInstance): void {
 
 	self.setActionDefinitions({
 		...deviceActions,
+		...createSystemActions(self),
 	})
+}
+
+// Not tied to any device -- bridge/connection-level maintenance actions.
+function createSystemActions(self: ModuleInstance): Record<string, CompanionActionDefinition> {
+	return {
+		system_rescan_devices: {
+			name: 'System: Rescan Devices',
+			options: [],
+			callback: async () => {
+				self.log('info', 'Rescanning devices...')
+				try {
+					await self.rescanDevices()
+				} catch (err) {
+					self.log('error', `Rescan failed: ${(err as Error).message}`)
+				}
+			},
+		},
+		system_reconnect_bridge: {
+			name: 'System: Reconnect to Bridge',
+			options: [],
+			callback: async () => {
+				self.log('info', 'Manual reconnect requested')
+				await self.handleBridgeDisconnected()
+			},
+		},
+	}
 }
 
 function createLevelAction(
