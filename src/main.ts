@@ -38,6 +38,7 @@ import {
 	SeedOccupancyVariableValues,
 	type OccupancySensorState,
 } from './occupancy.js'
+import { ClearAllSmartControlState, type SmartControlState } from './smartControl.js'
 
 const PAIRING_PORT = 8083
 const LEAP_PORT = 8081
@@ -63,6 +64,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	scenes: Record<string, VirtualButtonDefinition>
 	occupancySensors: Record<string, OccupancySensorState>
 	occupancyGroupToDevices: Record<string, string[]>
+	smartControlState: Record<string, SmartControlState>
 	isReconnecting: boolean
 	isDestroyed: boolean
 	healthCheckTimer?: ReturnType<typeof setInterval>
@@ -82,6 +84,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.fanPercentVariableIds = {}
 		this.occupancySensors = {}
 		this.occupancyGroupToDevices = {}
+		this.smartControlState = {}
 		this.isReconnecting = false
 		this.isDestroyed = false
 	}
@@ -221,6 +224,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		// on a module that's being torn down.
 		this.isDestroyed = true
 		this.stopHealthCheck()
+		ClearAllSmartControlState(this)
 		this.bridge?.close()
 	}
 
@@ -365,6 +369,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 
 		this.isReconnecting = true
 		this.stopHealthCheck()
+		ClearAllSmartControlState(this) // a hold/ramp mid-gesture can't be trusted across a dropped connection
 		this.log('warn', 'Bridge connection lost, attempting to reconnect')
 		this.updateStatus(InstanceStatus.Connecting, 'Reconnecting to bridge')
 

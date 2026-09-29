@@ -4,11 +4,8 @@ import { DeviceDefinition } from 'lutron-leap'
 import { getDeviceLevelType, getDeviceLabel, type DeviceLevelType } from './deviceTypes.js'
 import { BuildFanActions } from './fans.js'
 import { BuildSceneActions, RefreshScenes } from './scenes.js'
-
-// Used when we genuinely have no live reading yet for a dimmer (e.g. right at
-// startup, before its first status has arrived) -- a light should still turn on to
-// *something* usable rather than snapping to full brightness or staying dark.
-const DEFAULT_UNKNOWN_BRIGHTNESS = 65
+import { BuildSmartControlAction } from './smartControl.js'
+import { computeLevelForMode, sendLevel } from './levelControl.js'
 
 export function UpdateActions(self: ModuleInstance): void {
 	const entries = self.devicesOnBridge
@@ -30,6 +27,7 @@ export function UpdateActions(self: ModuleInstance): void {
 		...deviceActions,
 		...BuildFanActions(self),
 		...BuildSceneActions(self),
+		...BuildSmartControlAction(self),
 		...createSystemActions(self),
 	})
 }
@@ -151,64 +149,14 @@ function createLevelAction(
 		options,
 		callback: async (event) => {
 			const mode = event.options.mode as string
-			let level: number
-			switch (mode) {
-				case 'off':
-					level = 0
-					break
-				case 'full':
-					level = 100
-					break
-				case 'value':
-					level = event.options.brightness_value as number
-					break
-				case 'brighten': {
-					const current = self.currentLevel[device.SerialNumber] ?? DEFAULT_UNKNOWN_BRIGHTNESS
-					const step = (event.options.step_percent as number) || 10
-					level = Math.min(100, current + step)
-					break
-				}
-				case 'dim': {
-					const current = self.currentLevel[device.SerialNumber] ?? DEFAULT_UNKNOWN_BRIGHTNESS
-					const step = (event.options.step_percent as number) || 10
-					level = Math.max(0, current - step)
-					break
-				}
-				case 'on':
-				default:
-					level =
-						levelType === 'dimmer' ? (self.lastNonZeroLevel[device.SerialNumber] ?? DEFAULT_UNKNOWN_BRIGHTNESS) : 100
-			}
+			const level = computeLevelForMode(self, device, levelType, mode, event.options)
 
-			// fade time input is in seconds but needs to be formatted for the API. So 1.75 seconds becomes "00:00:01.7500"
 			const fadeTimeValue =
 				levelType === 'dimmer'
 					? ((mode === 'off' ? event.options.fade_time_off : event.options.fade_time_on) as number) || 0
 					: 0
-			const fadeTimeFormatted = `00:00:${Math.floor(fadeTimeValue).toString().padStart(2, '0')}.${((fadeTimeValue % 1) * 10000).toFixed(0).padStart(4, '0')}`
 
-			try {
-				self.log('debug', `Setting ${device.Name} to ${level}% with fade time ${fadeTimeFormatted}`)
-				const response = await self.bridge?.client.request(
-					'CreateRequest',
-					`${device.LocalZones[0].href}/commandprocessor`,
-					{
-						Command: {
-							CommandType: 'GoToDimmedLevel',
-							DimmedLevelParameters: { Level: level, FadeTime: fadeTimeFormatted },
-						},
-					},
-				)
-				if (!response?.Header.StatusCode?.code || response.Header.StatusCode.code > 299) {
-					const errorMessage = response?.Body && 'Message' in response.Body ? response.Body.Message : 'Unknown error'
-					self.log(
-						'error',
-						`Error setting ${device.Name}: ${response?.Header.StatusCode?.code} ${response?.Header.StatusCode?.message} - ${errorMessage}`,
-					)
-				}
-			} catch (err) {
-				self.log('error', `Error setting ${device.Name}: ${(err as Error).message}`)
-			}
+			await sendLevel(self, device, level, fadeTimeValue)
 		},
 	}
 }
