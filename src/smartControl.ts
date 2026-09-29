@@ -3,6 +3,7 @@ import type { ModuleInstance } from './main.js'
 import type { DeviceDefinition } from 'lutron-leap'
 import { getDeviceLevelType, getDeviceLabel } from './deviceTypes.js'
 import { sendLevel, DEFAULT_UNKNOWN_BRIGHTNESS } from './levelControl.js'
+import { markLightSelected } from './selectedLight.js'
 
 export interface SmartControlState {
 	pressedAt: number
@@ -152,6 +153,7 @@ export function BuildSmartControlAction(self: ModuleInstance): Record<string, Co
 				if (event.options.phase === 'release') {
 					await handleRelease(self, device, event.options)
 				} else {
+					markLightSelected(self, device) // touching this light selects it for its room (and the house-wide fallback)
 					handlePress(self, device, event.options)
 				}
 			},

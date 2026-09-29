@@ -39,6 +39,11 @@ import {
 	type OccupancySensorState,
 } from './occupancy.js'
 import { ClearAllSmartControlState, type SmartControlState } from './smartControl.js'
+import {
+	BuildSelectedLightVariableDefinitions,
+	SeedSelectedLightVariableValues,
+	refreshSelectedLightLevel,
+} from './selectedLight.js'
 
 const PAIRING_PORT = 8083
 const LEAP_PORT = 8081
@@ -65,6 +70,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	occupancySensors: Record<string, OccupancySensorState>
 	occupancyGroupToDevices: Record<string, string[]>
 	smartControlState: Record<string, SmartControlState>
+	roomSelectedDeviceSerial: Record<string, string>
 	isReconnecting: boolean
 	isDestroyed: boolean
 	healthCheckTimer?: ReturnType<typeof setInterval>
@@ -85,6 +91,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.occupancySensors = {}
 		this.occupancyGroupToDevices = {}
 		this.smartControlState = {}
+		this.roomSelectedDeviceSerial = {}
 		this.isReconnecting = false
 		this.isDestroyed = false
 	}
@@ -494,6 +501,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		if (variableId) {
 			this.setVariableValues({ [variableId]: level })
 		}
+
+		refreshSelectedLightLevel(this, device)
 	}
 
 	handleFanStatus(device: DeviceDefinition, body: BodyType | undefined): void {
@@ -530,11 +539,19 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		const picoVariables = BuildPicoVariableDefinitions(this)
 		const fanVariables = BuildFanVariableDefinitions(this)
 		const occupancyVariables = BuildOccupancyVariableDefinitions(this)
-		this.setVariableDefinitions([...deviceVariables, ...picoVariables, ...fanVariables, ...occupancyVariables])
+		const selectedLightVariables = BuildSelectedLightVariableDefinitions(this)
+		this.setVariableDefinitions([
+			...deviceVariables,
+			...picoVariables,
+			...fanVariables,
+			...occupancyVariables,
+			...selectedLightVariables,
+		])
 		SeedDeviceVariableValues(this)
 		SeedPicoVariableValues(this)
 		SeedFanVariableValues(this)
 		SeedOccupancyVariableValues(this)
+		SeedSelectedLightVariableValues(this)
 	}
 }
 

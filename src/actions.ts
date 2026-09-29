@@ -6,6 +6,7 @@ import { BuildFanActions } from './fans.js'
 import { BuildSceneActions, RefreshScenes } from './scenes.js'
 import { BuildSmartControlAction } from './smartControl.js'
 import { computeLevelForMode, sendLevel } from './levelControl.js'
+import { BuildSelectedLightAction, markLightSelected } from './selectedLight.js'
 
 export function UpdateActions(self: ModuleInstance): void {
 	const entries = self.devicesOnBridge
@@ -28,6 +29,7 @@ export function UpdateActions(self: ModuleInstance): void {
 		...BuildFanActions(self),
 		...BuildSceneActions(self),
 		...BuildSmartControlAction(self),
+		...BuildSelectedLightAction(self),
 		...createSystemActions(self),
 	})
 }
@@ -148,6 +150,8 @@ function createLevelAction(
 		name: label,
 		options,
 		callback: async (event) => {
+			markLightSelected(self, device) // this button was pressed for this light -- it's now "selected" for its room (and the house-wide fallback)
+
 			const mode = event.options.mode as string
 			const level = computeLevelForMode(self, device, levelType, mode, event.options)
 
