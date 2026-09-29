@@ -67,16 +67,28 @@ export async function sendLevel(
 	const zone = device.LocalZones[0]
 	if (!zone) return
 
-	const fadeTimeFormatted = formatFadeTime(fadeSeconds)
+	// A "Switched" zone (confirmed live: e.g. a garage door power relay) rejects
+	// GoToDimmedLevel outright -- "only supported on Dimmed zones" -- and has no
+	// fade concept of its own. Everything else (actual Dimmed zones, including
+	// switch-type devices that happen to be Dimmed zones under the hood) keeps
+	// using GoToDimmedLevel as before.
+	const isSwitchedZone = self.zoneControlType[device.SerialNumber] === 'Switched'
 
 	try {
-		self.log('debug', `Setting ${device.Name} to ${level}% with fade time ${fadeTimeFormatted}`)
-		const response = await self.bridge?.client.request('CreateRequest', `${zone.href}/commandprocessor`, {
-			Command: {
-				CommandType: 'GoToDimmedLevel',
-				DimmedLevelParameters: { Level: level, FadeTime: fadeTimeFormatted },
-			},
-		})
+		self.log(
+			'debug',
+			`Setting ${device.Name} to ${level}%${isSwitchedZone ? '' : ` with fade time ${formatFadeTime(fadeSeconds)}`}`,
+		)
+		const response = isSwitchedZone
+			? await self.bridge?.client.request('CreateRequest', `${zone.href}/commandprocessor`, {
+					Command: { CommandType: 'GoToLevel', Parameter: [{ Type: 'Level', Value: level }] },
+				})
+			: await self.bridge?.client.request('CreateRequest', `${zone.href}/commandprocessor`, {
+					Command: {
+						CommandType: 'GoToDimmedLevel',
+						DimmedLevelParameters: { Level: level, FadeTime: formatFadeTime(fadeSeconds) },
+					},
+				})
 		if (!response?.Header.StatusCode?.code || response.Header.StatusCode.code > 299) {
 			const errorMessage = response?.Body && 'Message' in response.Body ? response.Body.Message : 'Unknown error'
 			self.log(

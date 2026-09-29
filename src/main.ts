@@ -61,6 +61,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	deviceVariableIds: Record<string, string>
 	currentLevel: Record<string, number>
 	lastNonZeroLevel: Record<string, number>
+	zoneControlType: Record<string, string>
 	discoveredPicoDevices: Record<string, string>
 	picoButtons: Record<string, PicoButtonState>
 	currentFanSpeed: Record<string, FanSpeedType>
@@ -82,6 +83,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.deviceVariableIds = {}
 		this.currentLevel = {}
 		this.lastNonZeroLevel = {}
+		this.zoneControlType = {}
 		this.discoveredPicoDevices = {}
 		this.picoButtons = {}
 		this.scenes = {}
@@ -458,6 +460,23 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 				const zone = device.LocalZones[0]
 				if (!zone) return
 				const statusHref = `${zone.href}/status`
+
+				// A device we classify as a "switch" isn't necessarily a Lutron "Dimmed"
+				// zone under the hood -- confirmed live that some (e.g. a garage door
+				// power relay) are actually "Switched" zones, which reject
+				// GoToDimmedLevel outright ("only supported on Dimmed zones") and need a
+				// different command (see sendLevel in levelControl.ts). Fetching this
+				// once per device lets sendLevel pick the right one.
+				if (!isFanDevice(device)) {
+					try {
+						const zoneDef = await bridge.client.request('ReadRequest', zone.href)
+						if (zoneDef.Body && 'Zone' in zoneDef.Body) {
+							this.zoneControlType[device.SerialNumber] = zoneDef.Body.Zone.ControlType
+						}
+					} catch (err) {
+						this.log('warn', `Failed to read zone definition for ${device.Name}: ${(err as Error).message}`)
+					}
+				}
 
 				try {
 					const initial = await bridge.client.request('ReadRequest', statusHref)
