@@ -6,24 +6,13 @@ import type {
 } from '@companion-module/base'
 import type { DeviceDefinition, FanSpeedType } from 'lutron-leap'
 import { isFanDevice, getDeviceLabel, slugify } from './deviceTypes.js'
+import { sendFanSpeed } from './levelControl.js'
+import { markLightSelected } from './selectedLight.js'
+import { FAN_SPEED_CHOICES, FAN_SPEED_PERCENT } from './fanTypes.js'
 
-// Confirmed against a live bridge (Floor Fan, Bathroom Fan): zone status for a
-// CasetaFanSpeedController has a FanSpeed field only -- no Level -- with exactly
-// these 5 values.
-export const FAN_SPEED_CHOICES: FanSpeedType[] = ['Off', 'Low', 'Medium', 'MediumHigh', 'High']
-
-// Lutron's LEAP API never reports a numeric fan speed -- FanSpeed is always one of
-// the 5 names above. This mapping is our own assumption (an even 25% step per
-// speed), not something confirmed from Lutron documentation or the API itself.
-// Provided as a convenience for button-text formatting/math alongside the
-// authoritative text variable, not as a replacement for it.
-export const FAN_SPEED_PERCENT: Record<FanSpeedType, number> = {
-	Off: 0,
-	Low: 25,
-	Medium: 50,
-	MediumHigh: 75,
-	High: 100,
-}
+// Re-exported from fanTypes.ts (shared with selectedLight.ts) so existing
+// imports of these two from here keep working unchanged.
+export { FAN_SPEED_CHOICES, FAN_SPEED_PERCENT }
 
 export function BuildFanVariableDefinitions(self: ModuleInstance): CompanionVariableDefinition[] {
 	const entries = self.devicesOnBridge
@@ -100,29 +89,10 @@ function createFanSpeedAction(
 			},
 		],
 		callback: async (event) => {
+			markLightSelected(self, device) // this button was pressed for this fan -- it's now "selected" for its room (and the house-wide fallback)
+
 			const speed = event.options.speed as FanSpeedType
-			try {
-				self.log('debug', `Setting ${device.Name} fan speed to ${speed}`)
-				const response = await self.bridge?.client.request(
-					'CreateRequest',
-					`${device.LocalZones[0].href}/commandprocessor`,
-					{
-						Command: {
-							CommandType: 'GoToFanSpeed',
-							FanSpeedParameters: { FanSpeed: speed },
-						},
-					},
-				)
-				if (!response?.Header.StatusCode?.code || response.Header.StatusCode.code > 299) {
-					const errorMessage = response?.Body && 'Message' in response.Body ? response.Body.Message : 'Unknown error'
-					self.log(
-						'error',
-						`Error setting ${device.Name} fan speed: ${response?.Header.StatusCode?.code} ${response?.Header.StatusCode?.message} - ${errorMessage}`,
-					)
-				}
-			} catch (err) {
-				self.log('error', `Error setting ${device.Name} fan speed: ${(err as Error).message}`)
-			}
+			await sendFanSpeed(self, device, speed)
 		},
 	}
 }

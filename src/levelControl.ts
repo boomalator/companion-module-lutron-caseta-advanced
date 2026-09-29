@@ -1,6 +1,6 @@
 import type { CompanionOptionValues } from '@companion-module/base'
 import type { ModuleInstance } from './main.js'
-import type { DeviceDefinition } from 'lutron-leap'
+import type { DeviceDefinition, FanSpeedType } from 'lutron-leap'
 import type { DeviceLevelType } from './deviceTypes.js'
 
 // Used when we genuinely have no live reading yet for a dimmer (e.g. right at
@@ -86,5 +86,29 @@ export async function sendLevel(
 		}
 	} catch (err) {
 		self.log('error', `Error setting ${device.Name}: ${(err as Error).message}`)
+	}
+}
+
+export async function sendFanSpeed(self: ModuleInstance, device: DeviceDefinition, speed: FanSpeedType): Promise<void> {
+	const zone = device.LocalZones[0]
+	if (!zone) return
+
+	try {
+		self.log('debug', `Setting ${device.Name} fan speed to ${speed}`)
+		const response = await self.bridge?.client.request('CreateRequest', `${zone.href}/commandprocessor`, {
+			Command: {
+				CommandType: 'GoToFanSpeed',
+				FanSpeedParameters: { FanSpeed: speed },
+			},
+		})
+		if (!response?.Header.StatusCode?.code || response.Header.StatusCode.code > 299) {
+			const errorMessage = response?.Body && 'Message' in response.Body ? response.Body.Message : 'Unknown error'
+			self.log(
+				'error',
+				`Error setting ${device.Name} fan speed: ${response?.Header.StatusCode?.code} ${response?.Header.StatusCode?.message} - ${errorMessage}`,
+			)
+		}
+	} catch (err) {
+		self.log('error', `Error setting ${device.Name} fan speed: ${(err as Error).message}`)
 	}
 }

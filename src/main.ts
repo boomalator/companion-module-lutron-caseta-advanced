@@ -519,6 +519,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		if (percentVariableId) values[percentVariableId] = FAN_SPEED_PERCENT[speed]
 
 		this.setVariableValues(values)
+
+		refreshSelectedLightLevel(this, device)
 	}
 
 	// Return config fields for web config
