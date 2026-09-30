@@ -14,9 +14,27 @@ export interface SmartControlState {
 	rampLevel?: number
 }
 
-const LONG_PRESS_CHOICES = [
-	{ id: 'full_or_nudge', label: 'Full On (if off) / Nudge by Step % (if on)' },
-	{ id: 'toggle', label: 'Same as Tap (Resume/Off)' },
+// Shared by Tap and Long-Press, and by both their If-Off and If-On choices --
+// unconditional, atomic actions rather than named "if off do X, if on do Y"
+// combos, since any such combo grows the choice list combinatorially. Every
+// gesture's actual behavior is one of these, picked independently for whether
+// the light happens to be off or on at release time.
+const CONDITIONAL_ACTION_CHOICES = [
+	{ id: 'off', label: 'Off' },
+	{ id: 'on', label: 'On (Last)' },
+	{ id: 'full', label: 'On (Full)' },
+	{ id: 'specific', label: 'On (Specific %)' },
+	{ id: 'nudge_up', label: 'Nudge Up (+Step%)' },
+	{ id: 'nudge_down', label: 'Nudge Down (-Step%)' },
+	{ id: 'none', label: 'Do Nothing' },
+]
+
+// Hold has no "auto" mode -- you pick a direction (or turn it off entirely),
+// which reads clearer than trying to infer intent from current state, and
+// leaves Tap/Long-Press free to cover whichever direction Hold doesn't.
+const HOLD_MODE_CHOICES = [
+	{ id: 'up', label: 'Ramp Up' },
+	{ id: 'down', label: 'Ramp Down' },
 	{ id: 'none', label: 'Do Nothing' },
 ]
 
@@ -24,16 +42,25 @@ const LONG_PRESS_CHOICES = [
 // with Phase = Press, once into its Release actions with Phase = Release (both
 // instances targeting the same Device). That's it -- no dependence on Companion's
 // duration-group feature, just the plain press/release every surface has. Gives
-// three gestures per button, aimed at running a light off one or two buttons:
-//   - Tap:            toggle -- resume last level, or turn off
-//   - Long-press:      (release between the two thresholds) a single discrete
-//                       step -- full on if it was off, or nudge brighter by a
-//                       configurable % if it was already on
-//   - Press-and-hold:  continuous ramp for as long as it's held -- dims up from
-//                       off, or down towards off -- and simply stops in place on
-//                       release (no separate discrete action fires afterward,
-//                       since long-press is only evaluated when release happens
-//                       *before* the ramp ever started)
+// three independently-configurable gestures per button, aimed at running a
+// light off one or two buttons:
+//   - Tap:            (release before the tap threshold) If Off / If On, each
+//                      one of CONDITIONAL_ACTION_CHOICES -- defaults reproduce
+//                      a toggle (If Off: On (Last), If On: Off)
+//   - Long-press:      (release between the two thresholds) same shape, its
+//                      own If Off / If On -- defaults to If Off: On (Last),
+//                      If On: Nudge Up (deliberately *not* On (Full) by
+//                      default -- jumping to full brightness is a settled-for
+//                      behavior of dumb switches, not something to default to)
+//   - Press-and-hold:  continuous ramp for as long as it's held, in whichever
+//                      direction Hold Mode picks (Ramp Up / Ramp Down / Do
+//                      Nothing -- no "auto", so Tap/Long-Press are free to
+//                      cover whichever direction Hold doesn't) -- simply stops
+//                      in place on release, no discrete action fires
+//                      afterward, since Tap/Long-Press are only ever evaluated
+//                      when release happens *before* the ramp started
+// e.g. Tap = Nudge Down (both If Off/If On), Hold = Ramp Up, Long-Press If Off
+// = Off, If On = Off (i.e. Long-Press always turns it off).
 // Switches (no dimming) only get the tap gesture; press/long-press/hold all
 // just toggle.
 export function BuildSmartControlAction(self: ModuleInstance): Record<string, CompanionActionDefinition> {
@@ -82,13 +109,21 @@ export function BuildSmartControlAction(self: ModuleInstance): Record<string, Co
 					isVisible: (opts) => opts.phase === 'press',
 				},
 				{
+					id: 'hold_mode',
+					type: 'dropdown',
+					label: 'On Hold',
+					default: 'up',
+					choices: HOLD_MODE_CHOICES,
+					isVisible: (opts) => opts.phase === 'press',
+				},
+				{
 					id: 'ramp_rate_percent_per_sec',
 					type: 'number',
 					label: 'Ramp Rate (%/sec) while held',
 					default: 30,
 					min: 1,
 					max: 100,
-					isVisible: (opts) => opts.phase === 'press',
+					isVisible: (opts) => opts.phase === 'press' && opts.hold_mode !== 'none',
 				},
 				{
 					id: 'ramp_tick_ms',
@@ -97,7 +132,18 @@ export function BuildSmartControlAction(self: ModuleInstance): Record<string, Co
 					default: 150,
 					min: 50,
 					max: 1000,
-					isVisible: (opts) => opts.phase === 'press',
+					isVisible: (opts) => opts.phase === 'press' && opts.hold_mode !== 'none',
+				},
+				{
+					id: 'ramp_floor_percent',
+					type: 'number',
+					label: 'Ramp Floor (%)',
+					description: 'Ramp Down stops here instead of going all the way to 0. Default 0 -- ramps all the way off.',
+					range: true,
+					default: 0,
+					min: 0,
+					max: 99,
+					isVisible: (opts) => opts.phase === 'press' && opts.hold_mode === 'down',
 				},
 				{
 					id: 'tap_threshold_ms',
@@ -109,21 +155,71 @@ export function BuildSmartControlAction(self: ModuleInstance): Record<string, Co
 					isVisible: (opts) => opts.phase === 'release',
 				},
 				{
-					id: 'long_press_mode',
+					id: 'tap_if_off',
 					type: 'dropdown',
-					label: 'On Long-Press Release',
-					default: 'full_or_nudge',
-					choices: LONG_PRESS_CHOICES,
+					label: 'Tap, If Off',
+					default: 'on',
+					choices: CONDITIONAL_ACTION_CHOICES,
+					isVisible: (opts) => opts.phase === 'release',
+				},
+				{
+					id: 'tap_if_on',
+					type: 'dropdown',
+					label: 'Tap, If On',
+					default: 'off',
+					choices: CONDITIONAL_ACTION_CHOICES,
+					isVisible: (opts) => opts.phase === 'release',
+				},
+				{
+					id: 'long_press_if_off',
+					type: 'dropdown',
+					label: 'Long-Press, If Off',
+					default: 'on',
+					choices: CONDITIONAL_ACTION_CHOICES,
+					isVisible: (opts) => opts.phase === 'release',
+				},
+				{
+					id: 'long_press_if_on',
+					type: 'dropdown',
+					label: 'Long-Press, If On',
+					default: 'nudge_up',
+					choices: CONDITIONAL_ACTION_CHOICES,
 					isVisible: (opts) => opts.phase === 'release',
 				},
 				{
 					id: 'step_percent',
 					type: 'number',
-					label: 'Long-Press Nudge (%)',
+					label: 'Nudge Step (%)',
+					description: 'Used by any of the four gesture choices above when set to Nudge Up/Down.',
 					default: 10,
 					min: 1,
 					max: 100,
-					isVisible: (opts) => opts.phase === 'release' && opts.long_press_mode === 'full_or_nudge',
+					isVisible: (opts) =>
+						opts.phase === 'release' &&
+						(opts.tap_if_off === 'nudge_up' ||
+							opts.tap_if_off === 'nudge_down' ||
+							opts.tap_if_on === 'nudge_up' ||
+							opts.tap_if_on === 'nudge_down' ||
+							opts.long_press_if_off === 'nudge_up' ||
+							opts.long_press_if_off === 'nudge_down' ||
+							opts.long_press_if_on === 'nudge_up' ||
+							opts.long_press_if_on === 'nudge_down'),
+				},
+				{
+					id: 'specific_value_percent',
+					type: 'number',
+					label: 'Specific Value (%)',
+					description: 'Used by any of the four gesture choices above when set to On (Specific %).',
+					range: true,
+					default: 50,
+					min: 0,
+					max: 100,
+					isVisible: (opts) =>
+						opts.phase === 'release' &&
+						(opts.tap_if_off === 'specific' ||
+							opts.tap_if_on === 'specific' ||
+							opts.long_press_if_off === 'specific' ||
+							opts.long_press_if_on === 'specific'),
 				},
 				{
 					id: 'fade_time_on',
@@ -170,6 +266,9 @@ function handlePress(self: ModuleInstance, device: DeviceDefinition, options: Co
 
 	if (getDeviceLevelType(device) !== 'dimmer') return // switches: no ramp, just time the tap
 
+	const holdMode = (options.hold_mode as string) || 'up'
+	if (holdMode === 'none') return // Hold disabled on this instance -- any release just resolves as tap/long-press
+
 	const holdMs = (options.hold_threshold_ms as number) || 1000
 	state.holdTimer = setTimeout(() => startRamp(self, device, options), holdMs)
 }
@@ -179,12 +278,17 @@ function startRamp(self: ModuleInstance, device: DeviceDefinition, options: Comp
 	const state = self.smartControlState[serial]
 	if (!state) return
 
+	const holdMode = (options.hold_mode as string) || 'up'
+	if (holdMode !== 'up' && holdMode !== 'down') return // 'none' is filtered out before scheduling; defensive only
+
 	state.isRamping = true
 	state.holdTimer = undefined
+	state.rampDirection = holdMode
 
-	const current = self.currentLevel[serial] ?? 0
-	state.rampDirection = current > 0 ? 'down' : 'up'
-	state.rampLevel = current
+	// Only meaningful for Ramp Down -- 0 (default) means "can ramp all the way
+	// off". There's no equivalent ceiling below 100 for Ramp Up.
+	const floor = holdMode === 'down' ? Math.max(0, Math.min(99, (options.ramp_floor_percent as number) || 0)) : 0
+	state.rampLevel = self.currentLevel[serial] ?? 0
 
 	const tickMs = (options.ramp_tick_ms as number) || 150
 	const ratePerSec = (options.ramp_rate_percent_per_sec as number) || 30
@@ -194,15 +298,48 @@ function startRamp(self: ModuleInstance, device: DeviceDefinition, options: Comp
 		const next =
 			state.rampDirection === 'up'
 				? Math.min(100, (state.rampLevel ?? 0) + perTick)
-				: Math.max(0, (state.rampLevel ?? 0) - perTick)
+				: Math.max(floor, (state.rampLevel ?? 0) - perTick)
 		state.rampLevel = next
 		void sendLevel(self, device, next, 0)
 
-		if (next === 0 || next === 100) {
+		const reachedBound = state.rampDirection === 'up' ? next === 100 : next === floor
+		if (reachedBound) {
 			clearInterval(state.rampInterval)
 			state.rampInterval = undefined
 		}
 	}, tickMs)
+}
+
+// Shared by Tap and Long-Press -- both resolve to one of
+// CONDITIONAL_ACTION_CHOICES, already picked for the light's current state
+// (the caller chose the If-Off or If-On option before calling this).
+// Returns undefined for 'none' (do nothing).
+function resolveGestureLevel(
+	self: ModuleInstance,
+	device: DeviceDefinition,
+	mode: string,
+	options: CompanionOptionValues,
+): number | undefined {
+	const serial = device.SerialNumber
+	const step = (options.step_percent as number) || 10
+
+	switch (mode) {
+		case 'off':
+			return 0
+		case 'on':
+			return self.lastNonZeroLevel[serial] ?? DEFAULT_UNKNOWN_BRIGHTNESS
+		case 'full':
+			return 100
+		case 'specific':
+			return (options.specific_value_percent as number) ?? 50
+		case 'nudge_up':
+			return Math.min(100, (self.currentLevel[serial] ?? DEFAULT_UNKNOWN_BRIGHTNESS) + step)
+		case 'nudge_down':
+			return Math.max(0, (self.currentLevel[serial] ?? DEFAULT_UNKNOWN_BRIGHTNESS) - step)
+		case 'none':
+		default:
+			return undefined
+	}
 }
 
 async function handleRelease(
@@ -236,32 +373,15 @@ async function handleRelease(
 		return
 	}
 
-	if (elapsed < ((options.tap_threshold_ms as number) || 250)) {
-		// TAP: resume last non-zero level, or turn off.
-		const level = isOn ? 0 : (self.lastNonZeroLevel[serial] ?? DEFAULT_UNKNOWN_BRIGHTNESS)
-		await sendLevel(self, device, level, isOn ? fadeOff : fadeOn)
-		return
-	}
+	const isTap = elapsed < ((options.tap_threshold_ms as number) || 250)
+	const mode = isTap
+		? ((isOn ? options.tap_if_on : options.tap_if_off) as string)
+		: ((isOn ? options.long_press_if_on : options.long_press_if_off) as string)
 
-	// LONG PRESS: held past the tap threshold, but released before the ramp
-	// kicked in at the hold threshold.
-	const mode = (options.long_press_mode as string) || 'full_or_nudge'
-	if (mode === 'none') return
+	const level = resolveGestureLevel(self, device, mode || 'none', options)
+	if (level === undefined) return // 'none' -- do nothing
 
-	if (mode === 'toggle') {
-		const level = isOn ? 0 : (self.lastNonZeroLevel[serial] ?? DEFAULT_UNKNOWN_BRIGHTNESS)
-		await sendLevel(self, device, level, isOn ? fadeOff : fadeOn)
-		return
-	}
-
-	// 'full_or_nudge', matching the requested "if off, go full; if on, nudge" behavior.
-	if (!isOn) {
-		await sendLevel(self, device, 100, fadeOn)
-	} else {
-		const step = (options.step_percent as number) || 10
-		const next = Math.min(100, (self.currentLevel[serial] ?? 0) + step)
-		await sendLevel(self, device, next, fadeOn)
-	}
+	await sendLevel(self, device, level, level === 0 ? fadeOff : fadeOn)
 }
 
 function clearSmartControlState(self: ModuleInstance, serial: string): void {
