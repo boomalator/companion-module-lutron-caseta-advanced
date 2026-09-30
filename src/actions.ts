@@ -1,33 +1,17 @@
 import { CompanionActionDefinition } from '@companion-module/base'
 import type { ModuleInstance } from './main.js'
-import { DeviceDefinition } from 'lutron-leap'
-import { getDeviceLevelType, getDeviceLabel, type DeviceLevelType } from './deviceTypes.js'
-import { BuildFanActions } from './fans.js'
-import { BuildSceneActions, RefreshScenes } from './scenes.js'
+import { getDeviceLevelType, getDeviceLabel } from './deviceTypes.js'
+import { BuildSetFanAction } from './fans.js'
+import { BuildSetSceneAction, RefreshScenes } from './scenes.js'
 import { BuildSmartControlAction } from './smartControl.js'
 import { computeLevelForMode, sendLevel } from './levelControl.js'
 import { BuildSelectedLightAction, markLightSelected } from './selectedLight.js'
 
 export function UpdateActions(self: ModuleInstance): void {
-	const entries = self.devicesOnBridge
-		.map((device) => {
-			const levelType = getDeviceLevelType(device)
-			if (!levelType) return undefined
-			const label = getDeviceLabel(self.deviceAreaNames[device.SerialNumber] ?? '', device)
-			return { device, levelType, label }
-		})
-		.filter((entry) => entry !== undefined)
-		.sort((a, b) => a.label.localeCompare(b.label))
-
-	const deviceActions: Record<string, CompanionActionDefinition> = {}
-	entries.forEach(({ device, levelType, label }) => {
-		deviceActions[`${device.SerialNumber}_set_level`] = createLevelAction(self, label, device, levelType)
-	})
-
 	self.setActionDefinitions({
-		...deviceActions,
-		...BuildFanActions(self),
-		...BuildSceneActions(self),
+		...BuildSetControlAction(self),
+		...BuildSetFanAction(self),
+		...BuildSetSceneAction(self),
 		...BuildSmartControlAction(self),
 		...BuildSelectedLightAction(self),
 		...createSystemActions(self),
@@ -70,97 +54,105 @@ function createSystemActions(self: ModuleInstance): Record<string, CompanionActi
 	}
 }
 
-function createLevelAction(
-	self: ModuleInstance,
-	label: string,
-	device: DeviceDefinition,
-	levelType: DeviceLevelType,
-): CompanionActionDefinition {
-	const options: CompanionActionDefinition['options'] = [
-		{
-			id: 'mode',
-			type: 'dropdown',
-			label: levelType === 'dimmer' ? 'Control' : 'State',
-			default: 'on',
-			choices:
-				levelType === 'dimmer'
-					? [
-							{ id: 'on', label: 'On (Resume Last Level)' },
-							{ id: 'full', label: 'Full (100%)' },
-							{ id: 'off', label: 'Off' },
-							{ id: 'value', label: 'Specific Value' },
-							{ id: 'brighten', label: 'Brighten (+X%)' },
-							{ id: 'dim', label: 'Dim (-X%)' },
-						]
-					: [
-							{ id: 'on', label: 'On' },
-							{ id: 'off', label: 'Off' },
-						],
-		},
-	]
+// One generic action with a Device dropdown spanning both dimmers and
+// switches, instead of one action per device. A switch is just a dimmer
+// clamped to 0/100 as far as computeLevelForMode/sendLevel are concerned, so
+// there's no functional reason to split them into separate actions -- only a
+// cosmetic one (Brightness Value/Step/Fade Time are moot on a switch), and
+// Selected Light Control already accepts that same tradeoff.
+function BuildSetControlAction(self: ModuleInstance): Record<string, CompanionActionDefinition> {
+	const entries = self.devicesOnBridge
+		.filter((device) => getDeviceLevelType(device) !== undefined)
+		.map((device) => ({ device, label: getDeviceLabel(self.deviceAreaNames[device.SerialNumber] ?? '', device) }))
+		.sort((a, b) => a.label.localeCompare(b.label))
 
-	if (levelType === 'dimmer') {
-		options.push({
-			id: 'brightness_value',
-			type: 'number',
-			label: 'Brightness Value',
-			range: true,
-			default: 50,
-			min: 0,
-			max: 100,
-			isVisible: (opts) => opts.mode === 'value',
-		})
-		options.push({
-			id: 'step_percent',
-			type: 'number',
-			label: 'Step Amount (%)',
-			range: true,
-			default: 10,
-			min: 1,
-			max: 100,
-			isVisible: (opts) => opts.mode === 'brighten' || opts.mode === 'dim',
-		})
-		// Two fields (rather than one shared default) so "turning on" and "turning
-		// off" can have different defaults -- a fast fade up, a slower fade down.
-		options.push({
-			id: 'fade_time_on',
-			type: 'number',
-			label: 'Fade Time (seconds)',
-			default: 0.75,
-			min: 0,
-			max: 10,
-			step: 0.25,
-			range: true,
-			isVisible: (opts) => opts.mode !== 'off',
-		})
-		options.push({
-			id: 'fade_time_off',
-			type: 'number',
-			label: 'Fade Time (seconds)',
-			default: 2.5,
-			min: 0,
-			max: 10,
-			step: 0.25,
-			range: true,
-			isVisible: (opts) => opts.mode === 'off',
-		})
-	}
+	if (entries.length === 0) return {}
 
 	return {
-		name: label,
-		options,
-		callback: async (event) => {
-			markLightSelected(self, device) // this button was pressed for this light -- it's now "selected" for its room (and the house-wide fallback)
+		set_control: {
+			name: 'Set Control',
+			options: [
+				{
+					id: 'device',
+					type: 'dropdown',
+					label: 'Device',
+					default: entries[0].device.SerialNumber,
+					choices: entries.map((entry) => ({ id: entry.device.SerialNumber, label: entry.label })),
+				},
+				{
+					id: 'mode',
+					type: 'dropdown',
+					label: 'Control',
+					default: 'on',
+					choices: [
+						{ id: 'on', label: 'On (Resume Last Level)' },
+						{ id: 'full', label: 'Full (100%)' },
+						{ id: 'off', label: 'Off' },
+						{ id: 'value', label: 'Specific Value' },
+						{ id: 'brighten', label: 'Brighten (+X%)' },
+						{ id: 'dim', label: 'Dim (-X%)' },
+					],
+				},
+				{
+					id: 'brightness_value',
+					type: 'number',
+					label: 'Brightness Value',
+					range: true,
+					default: 50,
+					min: 0,
+					max: 100,
+					isVisible: (opts) => opts.mode === 'value',
+				},
+				{
+					id: 'step_percent',
+					type: 'number',
+					label: 'Step Amount (%)',
+					range: true,
+					default: 10,
+					min: 1,
+					max: 100,
+					isVisible: (opts) => opts.mode === 'brighten' || opts.mode === 'dim',
+				},
+				// Two fields (rather than one shared default) so "turning on" and
+				// "turning off" can have different defaults -- a fast fade up, a
+				// slower fade down. Moot for a switch, but harmless to leave visible.
+				{
+					id: 'fade_time_on',
+					type: 'number',
+					label: 'Fade Time (seconds)',
+					default: 0.75,
+					min: 0,
+					max: 10,
+					step: 0.25,
+					range: true,
+					isVisible: (opts) => opts.mode !== 'off',
+				},
+				{
+					id: 'fade_time_off',
+					type: 'number',
+					label: 'Fade Time (seconds)',
+					default: 2.5,
+					min: 0,
+					max: 10,
+					step: 0.25,
+					range: true,
+					isVisible: (opts) => opts.mode === 'off',
+				},
+			],
+			callback: async (event) => {
+				const device = self.devicesOnBridge.find((d) => d.SerialNumber === event.options.device)
+				if (!device) return
 
-			const mode = event.options.mode as string
-			const level = computeLevelForMode(self, device, levelType, mode, event.options)
+				markLightSelected(self, device) // this button was pressed for this device -- it's now "selected" for its room (and the house-wide fallback)
 
-			const fadeTimeValue =
-				levelType === 'dimmer'
-					? ((mode === 'off' ? event.options.fade_time_off : event.options.fade_time_on) as number) || 0
-					: 0
+				const levelType = getDeviceLevelType(device) ?? 'switch'
+				const mode = event.options.mode as string
+				const level = computeLevelForMode(self, device, levelType, mode, event.options)
+				const fadeTimeValue =
+					((mode === 'off' ? event.options.fade_time_off : event.options.fade_time_on) as number) || 0
 
-			await sendLevel(self, device, level, fadeTimeValue)
+				await sendLevel(self, device, level, fadeTimeValue)
+			},
 		},
 	}
 }
