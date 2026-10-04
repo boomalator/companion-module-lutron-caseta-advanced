@@ -1,0 +1,82 @@
+[
+	{
+		"serial": 65094338,
+		"area": "Garage Entry",
+		"name": "Main Lights",
+		"deviceType": "WallSwitch",
+		"variableId": "garage_entry_main_lights_state",
+		"roomVariableSlug": "garage_entry"
+	},
+	{
+		"serial": 65660547,
+		"area": "Main Floor",
+		"name": "Garage Door Power",
+		"deviceType": "WallSwitch",
+		"variableId": "main_floor_garage_door_power_state",
+		"roomVariableSlug": "main_floor"
+	},
+	{
+		"serial": 117414143,
+		"area": "Main Floor",
+		"name": "Garage Light 1",
+		"deviceType": "DivaSmartSwitch",
+		"variableId": "main_floor_garage_light_1_state",
+		"roomVariableSlug": "main_floor"
+	},
+	{
+		"serial": 65248331,
+		"area": "Main Floor",
+		"name": "Garage Light 2",
+		"deviceType": "WallSwitch",
+		"variableId": "main_floor_garage_light_2_state",
+		"roomVariableSlug": "main_floor"
+	},
+	{
+		"serial": 51106617,
+		"area": "Main Floor",
+		"name": "Garage Spare Power",
+		"deviceType": "WallSwitch",
+		"variableId": "main_floor_garage_spare_power_state",
+		"roomVariableSlug": "main_floor"
+	},
+	{
+		"serial": 65245641,
+		"area": "Main Floor",
+		"name": "Mud Room Light",
+		"deviceType": "WallSwitch",
+		"variableId": "main_floor_mud_room_light_state",
+		"roomVariableSlug": "main_floor"
+	},
+	{
+		"serial": 65094309,
+		"area": "Outside",
+		"name": "Back Deck Lights",
+		"deviceType": "WallSwitch",
+		"variableId": "outside_back_deck_lights_state",
+		"roomVariableSlug": "outside"
+	},
+	{
+		"serial": 68488402,
+		"area": "Outside",
+		"name": "Back Plug",
+		"deviceType": "OutdoorPlugInSwitch",
+		"variableId": "outside_back_plug_state",
+		"roomVariableSlug": "outside"
+	},
+	{
+		"serial": 65245645,
+		"area": "Outside",
+		"name": "Driveway Light",
+		"deviceType": "WallSwitch",
+		"variableId": "outside_driveway_light_state",
+		"roomVariableSlug": "outside"
+	},
+	{
+		"serial": 66252105,
+		"area": "Stairs",
+		"name": "Stair Lights",
+		"deviceType": "WallSwitch",
+		"variableId": "stairs_stair_lights_state",
+		"roomVariableSlug": "stairs"
+	}
+]

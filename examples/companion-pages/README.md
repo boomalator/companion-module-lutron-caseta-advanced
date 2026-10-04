@@ -1,8 +1,10 @@
-# Companion page samples: lights and scenes
+# Companion page samples: lights, switches and scenes
 
 Ready-to-import Companion pages for this module, plus the generators that made them:
 
 - **Lights**: a button for every dimmable light (`lights-page-N.companionconfig`).
+- **Switches**: a button for every switch, outdoor ones included
+  (`switches-page-N.companionconfig`).
 - **Scenes**: a button for every Lutron scene (`scenes-page-N.companionconfig`).
 
 Both kinds of page share a layout: each uses only 13 slots, to suit small surfaces and
@@ -35,6 +37,20 @@ Labels are two lines of at most 9 characters: the room on line 1, the fixture on
 line 2. A floor prefix (`Dn`, `Main`) appears only where two buttons would
 otherwise read the same. With this house that gives two pages: Downstairs + Main
 Floor, then Master Bedroom + Upstairs.
+
+## Switch buttons
+
+A switch is only ever on or off, so its button is simple: the name, an olive background
+while it is on, and a press that toggles it (Smart Step: if off, On (Full); if on, Off).
+Like a light's button it has a dot in the corner that shows it is the last light touched
+in its room. Switches are the module's wall switches, smart switches and outdoor plug-in
+switches; a switch that can't dim has no gauge or ramp. The state comes from the module's
+`<area>_<name>_state` variable, which is 0 or 100.
+
+Labels are one or two lines. With this house everything fits on one
+page: Garage, then House, then Outside. Some switches control things that aren't lights:
+Garage Door Power switches power to the garage door opener, so check what one does before
+putting it on a surface others can reach.
 
 ## Scene buttons
 
@@ -84,17 +100,18 @@ so the same number looks twice as large on a layer half the height.
 
 ## Files
 
-- `lights-page-1.companionconfig`, `lights-page-2.companionconfig`,
-  `scenes-page-1.companionconfig`, `scenes-page-2.companionconfig`: the importable
-  pages (JSON content; the `.companionconfig` extension is what Companion's file
+- `lights-page-N.companionconfig`, `switches-page-N.companionconfig`,
+  `scenes-page-N.companionconfig`: the importable pages (JSON content; the `.companionconfig` extension is what Companion's file
   picker filters on).
-- `reference-button.json`, `reference-scene-button.json`: the hand-built buttons every
+- `reference-button.json`, `reference-switch-button.json`, `reference-scene-button.json`: the hand-built buttons every
   other button is copied from. Edit the look or behaviour in Companion, export, and
   replace the file.
 - `devices.json`: the dimmers, with their exact module variable names and the two-line
   button labels.
+- `switches.json`: the switches, with their exact module variable names.
 - `scenes.json`: the scenes, as the bridge reports them (name and bridge id).
-- `generate-light-pages.mjs`, `generate-scene-pages.mjs`: build the page files.
+- `generate-light-pages.mjs`, `generate-switch-pages.mjs`, `generate-scene-pages.mjs`:
+  build the page files.
 - `page-lib.mjs`: layout, navigation and file writing shared by the generators.
 
 ## Importing
@@ -120,6 +137,16 @@ Variables list for that light (`<area>_<name>_brightness`), `roomVariableSlug`
 node generate-light-pages.mjs
 ```
 
+`switches.json` lists each switch's `serial`, `area`, `name`, `deviceType`, the
+`variableId` shown in Companion's Variables list for it (`<area>_<name>_state`) and
+`roomVariableSlug`. How each one looks (room and label) comes from `SWITCH_STYLES` in
+`generate-switch-pages.mjs`, by area and name, and the rooms from `ROOM_ORDER`. A switch with
+no entry still gets a button, in an "Other" group with a label made from its name. Then:
+
+```
+node generate-switch-pages.mjs
+```
+
 `scenes.json` is just each scene's `name` and bridge `href` (`/virtualbutton/N`, the id the
 Trigger Scene action stores). Refresh it whenever scenes are added or renamed in the
 Lutron app. How each scene looks (room, label, pictogram) comes from `SCENE_STYLES` in
@@ -132,9 +159,13 @@ stops over a new scene. Then:
 node generate-scene-pages.mjs
 ```
 
-Both generators check every label (at most two lines of nine characters) and that each
-button got exactly the substitutions it should, and stop with an error otherwise. A
-duplicate label is an error for lights and only a warning for scenes.
+All the generators check every label and that each button got exactly the substitutions it
+should, and stop with an error otherwise. A label is at most two lines of nine characters,
+and also narrow enough that Companion doesn't wrap it into a third: a line wider than its
+text layer wraps, and "Spare Pwr" is only nine characters but wraps where "Driveway" does
+not. The generators measure each line in Companion's default font (Arimo) at the button's
+text size, so the limit follows the reference button. A duplicate label is an error for
+lights and only a warning for scenes and switches.
 
 ## Don't publish a raw Companion export
 

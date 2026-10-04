@@ -16,7 +16,7 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { countOf, layoutGroups, makeId, validateLabels, writePages } from './page-lib.mjs'
+import { countOf, layoutGroups, lineLimitEm, makeId, validateLabels, writePages } from './page-lib.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 
@@ -102,7 +102,7 @@ function buildButton(device) {
 	return { control: walk(reference, ''), counts }
 }
 
-validateLabels(devices, (d) => d.name)
+validateLabels(devices, (d) => d.name, { limitEm: lineLimitEm(reference.style.layers.find((l) => l.id === 'text0')) })
 
 // Lights are grouped by Lutron area (alphabetical), and each area's lights are sorted by name.
 const areas = [...new Set(devices.map((d) => d.area))].sort((a, b) => a.localeCompare(b))

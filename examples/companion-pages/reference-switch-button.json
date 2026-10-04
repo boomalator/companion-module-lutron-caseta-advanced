@@ -1,0 +1,323 @@
+{
+	"type": "button-layered",
+	"style": {
+		"layers": [
+			{
+				"id": "canvas",
+				"name": "Canvas",
+				"usage": "auto",
+				"type": "canvas",
+				"decoration": {
+					"value": "none",
+					"isExpression": false
+				},
+				"showStatusIcons": {
+					"value": "default",
+					"isExpression": false
+				}
+			},
+			{
+				"id": "box0",
+				"name": "Background",
+				"usage": "auto",
+				"type": "box",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 0,
+					"isExpression": false
+				},
+				"y": {
+					"value": 0,
+					"isExpression": false
+				},
+				"width": {
+					"value": 100,
+					"isExpression": false
+				},
+				"height": {
+					"value": 100,
+					"isExpression": false
+				},
+				"rotation": {
+					"value": 0,
+					"isExpression": false
+				},
+				"color": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderWidth": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderColor": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderPosition": {
+					"value": "inside",
+					"isExpression": false
+				}
+			},
+			{
+				"id": "text0",
+				"name": "Text",
+				"usage": "auto",
+				"type": "text",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 0,
+					"isExpression": false
+				},
+				"y": {
+					"value": 0,
+					"isExpression": false
+				},
+				"width": {
+					"value": 100,
+					"isExpression": false
+				},
+				"height": {
+					"value": 100,
+					"isExpression": false
+				},
+				"rotation": {
+					"value": 0,
+					"isExpression": false
+				},
+				"text": {
+					"value": "Stairs",
+					"isExpression": false
+				},
+				"color": {
+					"value": 16777215,
+					"isExpression": false
+				},
+				"halign": {
+					"value": "center",
+					"isExpression": false
+				},
+				"valign": {
+					"value": "center",
+					"isExpression": false
+				},
+				"fontsize": {
+					"value": 25,
+					"isExpression": false
+				},
+				"fontsizeAllowShrink": {
+					"value": true,
+					"isExpression": false
+				},
+				"font": {
+					"value": "companion-sans",
+					"isExpression": false
+				},
+				"outlineColor": {
+					"value": 4278190080,
+					"isExpression": false
+				}
+			},
+			{
+				"id": "ojCUtjPSEOzu5qE7fIH3L",
+				"name": "Circle",
+				"usage": "auto",
+				"type": "circle",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 78,
+					"isExpression": false
+				},
+				"y": {
+					"value": 78,
+					"isExpression": false
+				},
+				"width": {
+					"value": 12,
+					"isExpression": false
+				},
+				"height": {
+					"value": 12,
+					"isExpression": false
+				},
+				"color": {
+					"value": 23807,
+					"isExpression": false
+				},
+				"startAngle": {
+					"value": 0,
+					"isExpression": false
+				},
+				"endAngle": {
+					"value": 360,
+					"isExpression": false
+				},
+				"drawSlice": {
+					"value": false,
+					"isExpression": false
+				},
+				"borderWidth": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderColor": {
+					"value": 16777215,
+					"isExpression": false
+				},
+				"borderPosition": {
+					"value": "center",
+					"isExpression": false
+				},
+				"borderOnlyArc": {
+					"value": false,
+					"isExpression": false
+				}
+			}
+		]
+	},
+	"options": {
+		"stepProgression": "auto",
+		"stepExpression": "",
+		"rotaryActions": false,
+		"canModifyStyleInApis": false,
+		"notes": ""
+	},
+	"feedbacks": [
+		{
+			"id": "jHNDbjUoFWPlFSCTLSab7",
+			"definitionId": "check_expression",
+			"connectionId": "internal",
+			"options": {
+				"expression": {
+					"value": "$(Caseta1:stairs_stair_lights_state) > 0",
+					"isExpression": true
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [
+				{
+					"overrideId": "YEhLRO14mIQ4WDwwP7F4L",
+					"elementId": "text0",
+					"elementProperty": "color",
+					"override": {
+						"isExpression": false,
+						"value": 16777215
+					}
+				},
+				{
+					"overrideId": "Woxh2oSt5XBHuEbciacAx",
+					"elementId": "box0",
+					"elementProperty": "color",
+					"override": {
+						"value": 6710784,
+						"isExpression": false
+					}
+				}
+			],
+			"children": {}
+		},
+		{
+			"id": "2aLq5VIhk3OD5clJFcUGV",
+			"definitionId": "check_expression",
+			"connectionId": "internal",
+			"options": {
+				"expression": {
+					"value": "$(Caseta1:room_stairs_selected_name) != \"Stair Lights\"",
+					"isExpression": true
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [
+				{
+					"overrideId": "7k1FtaHe3w5iNqd9wpCIa",
+					"elementId": "ojCUtjPSEOzu5qE7fIH3L",
+					"elementProperty": "enabled",
+					"override": {
+						"value": "",
+						"isExpression": false
+					}
+				}
+			],
+			"children": {}
+		}
+	],
+	"steps": {
+		"0": {
+			"action_sets": {
+				"down": [
+					{
+						"id": "gBjAE2St84aEJFtSsrk7D",
+						"definitionId": "smart_step",
+						"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+						"options": {
+							"device": {
+								"value": 66252105,
+								"isExpression": false
+							},
+							"if_off": {
+								"value": "full",
+								"isExpression": false
+							},
+							"if_on": {
+								"isExpression": false,
+								"value": "off"
+							},
+							"step_percent": {
+								"isExpression": false,
+								"value": 10
+							},
+							"specific_value_percent": {
+								"isExpression": false,
+								"value": 50
+							},
+							"fade_time_on": {
+								"value": 0,
+								"isExpression": false
+							},
+							"fade_time_off": {
+								"value": 0,
+								"isExpression": false
+							}
+						},
+						"upgradeIndex": -1,
+						"type": "action"
+					}
+				],
+				"up": []
+			},
+			"options": {
+				"runWhileHeld": []
+			}
+		}
+	},
+	"localVariables": []
+}

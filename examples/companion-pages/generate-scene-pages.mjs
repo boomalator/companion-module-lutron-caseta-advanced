@@ -25,9 +25,10 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
 	CONNECTION_LABEL,
-	MAX_LINE_CHARS,
+	autoLines,
 	countOf,
 	layoutGroups,
+	lineLimitEm,
 	makeId,
 	validateLabels,
 	writePages,
@@ -97,22 +98,9 @@ function assignVariableIds(list) {
 // "Off" as a word, any case: matches "Den Off" and "Mbr Off", not "Coffee" or "Offline".
 const isOffScene = (scene) => /\boff\b/i.test(scene.name)
 
-// A label for a scene with no entry in SCENE_STYLES: its words wrapped onto two lines of
-// at most MAX_LINE_CHARS characters, cut off if it doesn't fit.
-function autoLines(name) {
-	const lines = ['']
-	for (const word of name.trim().split(/\s+/)) {
-		const current = lines[lines.length - 1]
-		if (current === '') lines[lines.length - 1] = word
-		else if (`${current} ${word}`.length <= MAX_LINE_CHARS) lines[lines.length - 1] = `${current} ${word}`
-		else if (lines.length < 2) lines.push(word)
-		else lines[1] = `${lines[1]} ${word}`
-	}
-	return lines.map((line) => line.slice(0, MAX_LINE_CHARS))
-}
-
 const readJson = (name) => JSON.parse(readFileSync(join(here, name), 'utf8'))
 const reference = readJson('reference-scene-button.json')
+const labelLimitEm = lineLimitEm(reference.style.layers.find((l) => l.id === 'text0')) // how much text fits on a label line
 
 const scenes = readJson('scenes.json').map((scene) => {
 	const style = SCENE_STYLES[scene.name]
@@ -120,7 +108,7 @@ const scenes = readJson('scenes.json').map((scene) => {
 	return {
 		...scene,
 		room: style ? style[0] : OTHER_ROOM,
-		buttonLines: style ? style[1] : autoLines(scene.name),
+		buttonLines: style ? style[1] : autoLines(scene.name, labelLimitEm),
 		icon: style ? style[2] : FALLBACK_ICON,
 	}
 })
@@ -195,7 +183,7 @@ function buildButton(scene) {
 }
 
 // A label that is too long can't be fixed here, but a duplicate is only cosmetic.
-validateLabels(scenes, (s) => s.name, { allowDuplicates: true })
+validateLabels(scenes, (s) => s.name, { allowDuplicates: true, limitEm: labelLimitEm })
 for (const [name, [, , icon]] of Object.entries(SCENE_STYLES)) {
 	const length = [...icon].length
 	if (length < 1 || length > 3) throw new Error(`SCENE_STYLES "${name}": pictogram must be 1-3 characters`)
