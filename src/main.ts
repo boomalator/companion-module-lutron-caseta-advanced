@@ -41,6 +41,7 @@ import {
 } from './sceneState.js'
 import {
 	SubscribeToOccupancy,
+	RefreshSensorStatus,
 	BuildOccupancyVariableDefinitions,
 	SeedOccupancyVariableValues,
 	type OccupancySensorState,
@@ -440,6 +441,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 				this.bridge.ping(),
 				new Promise((_resolve, reject) => setTimeout(() => reject(new Error('timed out')), HEALTH_CHECK_TIMEOUT_MS)),
 			])
+			void RefreshSensorStatus(this) // battery and availability aren't pushed, so check them while we're here
 		} catch (err) {
 			this.log('warn', `Bridge health check failed: ${(err as Error).message}`)
 			void this.handleBridgeDisconnected()

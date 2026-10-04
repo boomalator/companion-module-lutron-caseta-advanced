@@ -5,6 +5,9 @@ export interface ModuleConfig {
 	port: number
 	bridgeID?: string
 	picoDeviceIds?: string[]
+	// Written by the module, not set in the config screen: each occupancy sensor's last state and
+	// when it last changed each way (Unix ms, 0 if never seen), keyed by device serial.
+	occupancyChanges?: Record<string, { occupied: boolean; lastTrue: number; lastFalse: number }>
 }
 
 export interface ModuleSecrets {

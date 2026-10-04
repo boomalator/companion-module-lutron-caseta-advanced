@@ -2,6 +2,7 @@ import type { ModuleInstance } from './main.js'
 import type { CompanionVariableDefinition, CompanionVariableValues } from '@companion-module/base'
 import type { DeviceDefinition, OccupancyGroupStatus, OccupancyGroupDefinition } from 'lutron-leap'
 import { getDeviceLabel, slugify } from './deviceTypes.js'
+import type { ModuleConfig } from './config.js'
 
 const OCCUPANCY_SENSOR_DEVICE_TYPE = 'RPSOccupancySensor'
 
@@ -25,6 +26,18 @@ export interface OccupancySensorState {
 	variableIdOccupied: string
 	variableIdLastTrue: string
 	variableIdLastFalse: string
+	// What the bridge reports about the sensor itself (read from /device/N/status, which it
+	// won't push, so it is refreshed on the health-check cycle): Available / Unavailable /
+	// Unknown, and the battery's LevelState (Good, Low, ...).
+	deviceHref: string
+	availability?: string
+	battery?: string
+	variableIdAvailability: string
+	variableIdBattery: string
+}
+
+interface DeviceStatusBody {
+	DeviceStatus?: { Availability?: string; BatteryStatus?: { LevelState?: string } }
 }
 
 // Confirmed against a live bridge: LEAP reports occupancy per "occupancy group",
@@ -82,6 +95,9 @@ export async function SubscribeToOccupancy(self: ModuleInstance): Promise<void> 
 						variableIdOccupied: '',
 						variableIdLastTrue: '',
 						variableIdLastFalse: '',
+						deviceHref: device.href,
+						variableIdAvailability: '',
+						variableIdBattery: '',
 					}
 				}
 			})
@@ -92,6 +108,7 @@ export async function SubscribeToOccupancy(self: ModuleInstance): Promise<void> 
 		})
 
 		handleOccupancyStatuses(self, body.OccupancyGroupStatuses)
+		await RefreshSensorStatus(self)
 
 		await bridge.client.subscribe('/occupancygroup/status', (resp) => {
 			const b = resp.Body
@@ -107,6 +124,7 @@ export async function SubscribeToOccupancy(self: ModuleInstance): Promise<void> 
 function handleOccupancyStatuses(self: ModuleInstance, statuses: OccupancyGroupStatus[]): void {
 	const values: CompanionVariableValues = {}
 	const now = Date.now()
+	let changed = false
 
 	statuses.forEach((status) => {
 		const deviceSerials = self.occupancyGroupToDevices[status.OccupancyGroup.href]
@@ -122,17 +140,25 @@ function handleOccupancyStatuses(self: ModuleInstance, statuses: OccupancyGroupS
 			state.occupied = occupied
 
 			if (wasOccupied === undefined) {
-				// First observation for this sensor: we don't actually know when it
-				// last changed either direction. Seed both to the Unix-epoch sentinel
-				// (0 -- the ms equivalent of the conventional 0000-00-00) rather than
-				// leaving one undefined, so "time since" math (unixNow() - last_true)
-				// always returns a huge-but-valid number for "never observed" instead
-				// of needing special-cased undefined handling.
-				state.lastTrue = 0
-				state.lastFalse = 0
+				// First observation since the module started. The bridge never says when a
+				// sensor last changed, so what we know comes from what was saved the last
+				// time we watched it (see persistChangeTimes). With nothing saved we don't
+				// know when it changed either way, so both are the Unix-epoch sentinel (0)
+				// rather than undefined, so "time since" math (unixNow() - last_true) is
+				// always a valid number for "never observed".
+				const saved = self.config.occupancyChanges?.[serial]
+				state.lastTrue = saved?.lastTrue ?? 0
+				state.lastFalse = saved?.lastFalse ?? 0
+				// It changed while the module wasn't watching: the best time we have is now.
+				if (saved && saved.occupied !== occupied) {
+					if (occupied) state.lastTrue = now
+					else state.lastFalse = now
+				}
+				changed = true
 			} else if (wasOccupied !== occupied) {
 				if (occupied) state.lastTrue = now
 				else state.lastFalse = now
+				changed = true
 			}
 
 			if (state.variableIdOccupied) values[state.variableIdOccupied] = occupied
@@ -143,6 +169,60 @@ function handleOccupancyStatuses(self: ModuleInstance, statuses: OccupancyGroupS
 	})
 
 	self.setVariableValues(values)
+	if (changed) persistChangeTimes(self)
+}
+
+// Saves each sensor's state and change times in the module's config, so "time in this
+// state" survives a restart instead of starting again from "unknown". Written only when
+// something differs from what is already saved.
+function persistChangeTimes(self: ModuleInstance): void {
+	const current: NonNullable<ModuleConfig['occupancyChanges']> = {}
+	for (const state of Object.values(self.occupancySensors)) {
+		if (state.occupied === undefined) continue
+		current[state.deviceSerial] = {
+			occupied: state.occupied,
+			lastTrue: state.lastTrue ?? 0,
+			lastFalse: state.lastFalse ?? 0,
+		}
+	}
+	if (JSON.stringify(current) === JSON.stringify(self.config.occupancyChanges)) return
+
+	self.config.occupancyChanges = current
+	self.saveConfig(self.config, self.secrets)
+}
+
+// Reads each sensor's own status: whether the bridge can reach it and its battery level.
+// Called when sensors are set up and on every health-check cycle; the bridge doesn't push
+// these, and they change slowly.
+export async function RefreshSensorStatus(self: ModuleInstance): Promise<void> {
+	const bridge = self.bridge
+	if (!bridge) return
+
+	const values: CompanionVariableValues = {}
+	await Promise.all(
+		Object.values(self.occupancySensors).map(async (state) => {
+			try {
+				const body = (await bridge.client.request('ReadRequest', `${state.deviceHref}/status`))
+					.Body as unknown as DeviceStatusBody
+				const status = body?.DeviceStatus
+				if (!status) return
+
+				const availability = status.Availability ?? 'Unknown'
+				const battery = status.BatteryStatus?.LevelState ?? 'Unknown'
+				if (availability !== state.availability) {
+					state.availability = availability
+					if (state.variableIdAvailability) values[state.variableIdAvailability] = availability
+				}
+				if (battery !== state.battery) {
+					state.battery = battery
+					if (state.variableIdBattery) values[state.variableIdBattery] = battery
+				}
+			} catch (err) {
+				self.log('debug', `Could not read the status of ${state.label}: ${(err as Error).message}`)
+			}
+		}),
+	)
+	if (Object.keys(values).length > 0) self.setVariableValues(values)
 }
 
 export function BuildOccupancyVariableDefinitions(self: ModuleInstance): CompanionVariableDefinition[] {
@@ -161,11 +241,15 @@ export function BuildOccupancyVariableDefinitions(self: ModuleInstance): Compani
 		state.variableIdOccupied = `${base}_occupied`
 		state.variableIdLastTrue = `${base}_last_true`
 		state.variableIdLastFalse = `${base}_last_false`
+		state.variableIdAvailability = `${base}_availability`
+		state.variableIdBattery = `${base}_battery`
 
 		variables.push(
 			{ variableId: state.variableIdOccupied, name: state.label },
 			{ variableId: state.variableIdLastTrue, name: `${state.label} Last Occupied` },
 			{ variableId: state.variableIdLastFalse, name: `${state.label} Last Vacant` },
+			{ variableId: state.variableIdAvailability, name: `${state.label} Availability` },
+			{ variableId: state.variableIdBattery, name: `${state.label} Battery` },
 		)
 	})
 
@@ -178,6 +262,9 @@ export function SeedOccupancyVariableValues(self: ModuleInstance): void {
 		if (state.occupied !== undefined && state.variableIdOccupied) values[state.variableIdOccupied] = state.occupied
 		if (state.lastTrue !== undefined && state.variableIdLastTrue) values[state.variableIdLastTrue] = state.lastTrue
 		if (state.lastFalse !== undefined && state.variableIdLastFalse) values[state.variableIdLastFalse] = state.lastFalse
+		if (state.availability !== undefined && state.variableIdAvailability)
+			values[state.variableIdAvailability] = state.availability
+		if (state.battery !== undefined && state.variableIdBattery) values[state.variableIdBattery] = state.battery
 	})
 	self.setVariableValues(values)
 }
