@@ -58,7 +58,63 @@ export function formatFadeTime(seconds: number): string {
 	return `00:00:${Math.floor(clamped).toString().padStart(2, '0')}.${((clamped % 1) * 10000).toFixed(0).padStart(4, '0')}`
 }
 
+interface PendingLevel {
+	device: DeviceDefinition
+	level: number
+	fadeSeconds: number
+	done: Array<() => void>
+}
+
+// Per zone: whether a request is on the wire, and the newest command that arrived
+// meanwhile. Measured on a real bridge, a zone only handles ~6 level commands/sec
+// (~140ms each); a faster stream (a ramp, repeated nudges, a busy network) queues
+// up at the bridge, and the light keeps moving for seconds after the input stops.
+interface ZoneQueue {
+	busy: boolean
+	pending?: PendingLevel
+}
+const zoneQueues = new WeakMap<ModuleInstance, Map<string, ZoneQueue>>()
+
+// At most one level request per zone is ever in flight. Commands that arrive
+// meanwhile replace each other, so only the newest goes out next -- an older level
+// is stale by then. The returned promise resolves once the command it was part of
+// (its own, or the newer one that replaced it) has completed.
 export async function sendLevel(
+	self: ModuleInstance,
+	device: DeviceDefinition,
+	level: number,
+	fadeSeconds: number,
+): Promise<void> {
+	const zone = device.LocalZones[0]
+	if (!zone) return Promise.resolve()
+
+	let queues = zoneQueues.get(self)
+	if (!queues) zoneQueues.set(self, (queues = new Map()))
+	let queue = queues.get(zone.href)
+	if (!queue) queues.set(zone.href, (queue = { busy: false }))
+
+	return new Promise<void>((resolve) => {
+		const done = [...(queue.pending?.done ?? []), resolve]
+		queue.pending = { device, level, fadeSeconds, done }
+		if (!queue.busy) void drainZone(self, queue)
+	})
+}
+
+async function drainZone(self: ModuleInstance, queue: ZoneQueue): Promise<void> {
+	queue.busy = true
+	try {
+		while (queue.pending) {
+			const { device, level, fadeSeconds, done } = queue.pending
+			queue.pending = undefined
+			await transmitLevel(self, device, level, fadeSeconds)
+			done.forEach((resolve) => resolve())
+		}
+	} finally {
+		queue.busy = false
+	}
+}
+
+async function transmitLevel(
 	self: ModuleInstance,
 	device: DeviceDefinition,
 	level: number,
