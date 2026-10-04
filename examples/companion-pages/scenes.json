@@ -1,0 +1,62 @@
+[
+	{
+		"href": "/virtualbutton/3",
+		"name": "Downstairs TV Mellow"
+	},
+	{
+		"href": "/virtualbutton/4",
+		"name": "Downstairs Off"
+	},
+	{
+		"href": "/virtualbutton/5",
+		"name": "Den Work"
+	},
+	{
+		"href": "/virtualbutton/6",
+		"name": "Parent Bed Time"
+	},
+	{
+		"href": "/virtualbutton/7",
+		"name": "All Off"
+	},
+	{
+		"href": "/virtualbutton/8",
+		"name": "Den Record 1"
+	},
+	{
+		"href": "/virtualbutton/9",
+		"name": "MBR Morning"
+	},
+	{
+		"href": "/virtualbutton/10",
+		"name": "Living Room Evening"
+	},
+	{
+		"href": "/virtualbutton/11",
+		"name": "Mbr Off"
+	},
+	{
+		"href": "/virtualbutton/12",
+		"name": "Pathway Full"
+	},
+	{
+		"href": "/virtualbutton/13",
+		"name": "Pathway Minimal"
+	},
+	{
+		"href": "/virtualbutton/14",
+		"name": "Den Medium"
+	},
+	{
+		"href": "/virtualbutton/15",
+		"name": "Den Dim"
+	},
+	{
+		"href": "/virtualbutton/16",
+		"name": "Den Off"
+	},
+	{
+		"href": "/virtualbutton/17",
+		"name": "TV Bright"
+	}
+]

@@ -1,0 +1,513 @@
+{
+	"type": "button-layered",
+	"style": {
+		"layers": [
+			{
+				"id": "canvas",
+				"name": "Canvas",
+				"usage": "auto",
+				"type": "canvas",
+				"decoration": {
+					"value": "border",
+					"isExpression": false
+				},
+				"showStatusIcons": {
+					"value": "default",
+					"isExpression": false
+				}
+			},
+			{
+				"id": "box0",
+				"name": "Background",
+				"usage": "auto",
+				"type": "box",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 0,
+					"isExpression": false
+				},
+				"y": {
+					"value": 0,
+					"isExpression": false
+				},
+				"width": {
+					"value": 100,
+					"isExpression": false
+				},
+				"height": {
+					"value": 100,
+					"isExpression": false
+				},
+				"rotation": {
+					"value": 0,
+					"isExpression": false
+				},
+				"color": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderWidth": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderColor": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderPosition": {
+					"value": "inside",
+					"isExpression": false
+				}
+			},
+			{
+				"id": "text0",
+				"name": "Label",
+				"usage": "auto",
+				"type": "text",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 0,
+					"isExpression": false
+				},
+				"y": {
+					"value": 49,
+					"isExpression": false
+				},
+				"width": {
+					"value": 100,
+					"isExpression": false
+				},
+				"height": {
+					"value": 47,
+					"isExpression": false
+				},
+				"rotation": {
+					"value": 0,
+					"isExpression": false
+				},
+				"text": {
+					"value": "Den\\nMedium",
+					"isExpression": false
+				},
+				"color": {
+					"value": 16777215,
+					"isExpression": false
+				},
+				"halign": {
+					"value": "center",
+					"isExpression": false
+				},
+				"valign": {
+					"value": "top",
+					"isExpression": false
+				},
+				"fontsize": {
+					"value": 50,
+					"isExpression": false
+				},
+				"fontsizeAllowShrink": {
+					"value": false,
+					"isExpression": false
+				},
+				"font": {
+					"value": "companion-sans",
+					"isExpression": false
+				},
+				"outlineColor": {
+					"value": 4278190080,
+					"isExpression": false
+				}
+			},
+			{
+				"id": "Sl2THdAsw3YzHS-KcFhrs",
+				"name": "Icon",
+				"usage": "auto",
+				"type": "text",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 0,
+					"isExpression": false
+				},
+				"y": {
+					"value": 4,
+					"isExpression": false
+				},
+				"width": {
+					"value": 100,
+					"isExpression": false
+				},
+				"height": {
+					"value": 52,
+					"isExpression": false
+				},
+				"rotation": {
+					"value": 0,
+					"isExpression": false
+				},
+				"text": {
+					"value": "💻",
+					"isExpression": false
+				},
+				"color": {
+					"value": 16777215,
+					"isExpression": false
+				},
+				"halign": {
+					"value": "center",
+					"isExpression": false
+				},
+				"valign": {
+					"value": "center",
+					"isExpression": false
+				},
+				"fontsize": {
+					"value": 100,
+					"isExpression": false
+				},
+				"fontsizeAllowShrink": {
+					"value": true,
+					"isExpression": false
+				},
+				"font": {
+					"value": "companion-sans",
+					"isExpression": false
+				},
+				"outlineColor": {
+					"value": 4278190080,
+					"isExpression": false
+				}
+			}
+		]
+	},
+	"options": {
+		"stepProgression": "auto",
+		"stepExpression": "",
+		"rotaryActions": false,
+		"canModifyStyleInApis": false,
+		"notes": ""
+	},
+	"feedbacks": [
+		{
+			"id": "pxE7N-3mv2IEKDPFEWa4_",
+			"definitionId": "check_expression",
+			"connectionId": "internal",
+			"options": {
+				"expression": {
+					"value": "$(Caseta1:scene_den_medium_active) == 1 && $(local:HeldNow) == 0",
+					"isExpression": true
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [
+				{
+					"overrideId": "jbMCE335lxW9GrUB4zB35",
+					"elementId": "text0",
+					"elementProperty": "color",
+					"override": {
+						"isExpression": false,
+						"value": 16777215
+					}
+				},
+				{
+					"overrideId": "r3ze246oRr7bJmleDsZfv",
+					"elementId": "box0",
+					"elementProperty": "color",
+					"override": {
+						"value": 3881729,
+						"isExpression": false
+					}
+				}
+			],
+			"children": {}
+		},
+		{
+			"id": "QNup4COdIpyrA9EsvxPFL",
+			"definitionId": "variable_value",
+			"connectionId": "internal",
+			"options": {
+				"variable": {
+					"value": "local:HeldNow",
+					"isExpression": false
+				},
+				"op": {
+					"isExpression": false,
+					"value": "eq"
+				},
+				"value": {
+					"value": "1",
+					"isExpression": false
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [
+				{
+					"overrideId": "8Tse-kdDL9KBR_1MmLA4j",
+					"elementId": "text0",
+					"elementProperty": "color",
+					"override": {
+						"value": 3355392,
+						"isExpression": false
+					}
+				},
+				{
+					"overrideId": "swP4v9kfa05bZ7k4krMVb",
+					"elementId": "box0",
+					"elementProperty": "color",
+					"override": {
+						"value": 16777215,
+						"isExpression": false
+					}
+				},
+				{
+					"overrideId": "IujBU36uI6LRwKkLvQUnM",
+					"elementId": "Sl2THdAsw3YzHS-KcFhrs",
+					"elementProperty": "color",
+					"override": {
+						"value": 3355392,
+						"isExpression": false
+					}
+				}
+			],
+			"children": {}
+		}
+	],
+	"steps": {
+		"0": {
+			"action_sets": {
+				"600": [
+					{
+						"id": "1YLXIM03cYhtjE2OZLKqw",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "1",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				],
+				"601": [
+					{
+						"id": "ZIBJ2CIUfI2XOl7M-GSRq",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "0",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					},
+					{
+						"id": "3xvNJSBbWZIs1oLctpxiK",
+						"definitionId": "trigger_scene",
+						"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+						"options": {
+							"scene": {
+								"value": "/virtualbutton/14",
+								"isExpression": false
+							},
+							"action": {
+								"value": "off",
+								"isExpression": false
+							},
+							"fade_time_off": {
+								"value": 0.75,
+								"isExpression": false
+							}
+						},
+						"upgradeIndex": -1,
+						"type": "action"
+					}
+				],
+				"3000": [
+					{
+						"id": "OJjrxY_ekWKPLHBWicTgy",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "0",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				],
+				"3001": [
+					{
+						"id": "WmmiwAgb0tvlm-iP2FAsC",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "0",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				],
+				"down": [
+					{
+						"id": "xrB8tsWjH-wIZ0Y915iZV",
+						"definitionId": "trigger_scene",
+						"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+						"options": {
+							"scene": {
+								"value": "/virtualbutton/14",
+								"isExpression": false
+							},
+							"action": {
+								"value": "activate",
+								"isExpression": false
+							}
+						},
+						"upgradeIndex": -1,
+						"type": "action"
+					},
+					{
+						"id": "3zD5_jvBb1axytD7WnsZM",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "0",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				],
+				"up": [
+					{
+						"id": "AsYWlxSHCsnMSYO0O99SI",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "0",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				]
+			},
+			"options": {
+				"runWhileHeld": [600, 3000]
+			}
+		}
+	},
+	"localVariables": [
+		{
+			"id": "lnWW6qz6ZFYcERZGLDMRx",
+			"definitionId": "user_value",
+			"connectionId": "internal",
+			"options": {
+				"persist_value": {
+					"isExpression": false,
+					"value": false
+				},
+				"startup_value": {
+					"value": "0",
+					"isExpression": false
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [],
+			"variableName": "HeldNow",
+			"children": {}
+		}
+	]
+}

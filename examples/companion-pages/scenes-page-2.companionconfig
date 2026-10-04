@@ -1,0 +1,2593 @@
+{
+	"version": 12,
+	"type": "page",
+	"companionBuild": "5.0.6+9750-stable-1acd2318f5",
+	"page": {
+		"id": "SVAYS5GHSH7Nw0qOOifhD",
+		"name": "Scenes 2",
+		"controls": {
+			"0": {
+				"0": {
+					"type": "button-layered",
+					"style": {
+						"layers": [
+							{
+								"id": "canvas",
+								"name": "Canvas",
+								"usage": "auto",
+								"type": "canvas",
+								"decoration": {
+									"value": "border",
+									"isExpression": false
+								},
+								"showStatusIcons": {
+									"value": "default",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "box0",
+								"name": "Background",
+								"usage": "auto",
+								"type": "box",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 0,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 100,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"color": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderWidth": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderColor": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderPosition": {
+									"value": "inside",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "text0",
+								"name": "Label",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 49,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 47,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "Parent\\nBedtime",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "top",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 50,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": false,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							},
+							{
+								"id": "Sl2THdAsw3YzHS-KcFhrs",
+								"name": "Icon",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 4,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 52,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "🛏",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 100,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": true,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							}
+						]
+					},
+					"options": {
+						"stepProgression": "auto",
+						"stepExpression": "",
+						"rotaryActions": false,
+						"canModifyStyleInApis": false,
+						"notes": ""
+					},
+					"feedbacks": [
+						{
+							"id": "N5ncW4Kv2kbjz-mwVNJGM",
+							"definitionId": "check_expression",
+							"connectionId": "internal",
+							"options": {
+								"expression": {
+									"value": "$(Caseta1:scene_parent_bed_time_active) == 1 && $(local:HeldNow) == 0",
+									"isExpression": true
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [
+								{
+									"overrideId": "NC021b7mv-d62_1jsy7fK",
+									"elementId": "text0",
+									"elementProperty": "color",
+									"override": {
+										"isExpression": false,
+										"value": 16777215
+									}
+								},
+								{
+									"overrideId": "38DXlgY-MGASNoqs3mU1O",
+									"elementId": "box0",
+									"elementProperty": "color",
+									"override": {
+										"value": 3881729,
+										"isExpression": false
+									}
+								}
+							],
+							"children": {}
+						},
+						{
+							"id": "OPldj49GeTqTDE3uswxtc",
+							"definitionId": "variable_value",
+							"connectionId": "internal",
+							"options": {
+								"variable": {
+									"value": "local:HeldNow",
+									"isExpression": false
+								},
+								"op": {
+									"isExpression": false,
+									"value": "eq"
+								},
+								"value": {
+									"value": "1",
+									"isExpression": false
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [
+								{
+									"overrideId": "aRcz9T_bZlUF-aomcoa2r",
+									"elementId": "text0",
+									"elementProperty": "color",
+									"override": {
+										"value": 3355392,
+										"isExpression": false
+									}
+								},
+								{
+									"overrideId": "X_y3lfARGTd8IT8OmR8-Y",
+									"elementId": "box0",
+									"elementProperty": "color",
+									"override": {
+										"value": 16777215,
+										"isExpression": false
+									}
+								},
+								{
+									"overrideId": "gz56xcH2uh9diGdm23PPT",
+									"elementId": "Sl2THdAsw3YzHS-KcFhrs",
+									"elementProperty": "color",
+									"override": {
+										"value": 3355392,
+										"isExpression": false
+									}
+								}
+							],
+							"children": {}
+						}
+					],
+					"steps": {
+						"0": {
+							"action_sets": {
+								"600": [
+									{
+										"id": "kIf23GL9iclxmJWbb7P8F",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "1",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"601": [
+									{
+										"id": "RE6Tw4znLVS-QB-Fx_Sj4",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									},
+									{
+										"id": "AcjVl3PxOGxYahTR6MVS-",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/6",
+												"isExpression": false
+											},
+											"action": {
+												"value": "off",
+												"isExpression": false
+											},
+											"fade_time_off": {
+												"value": 0.75,
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									}
+								],
+								"3000": [
+									{
+										"id": "S63A2mF9Vmr6N8ifVuWAC",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"3001": [
+									{
+										"id": "FejQ2WWu_H4UnxvWQYtfp",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"down": [
+									{
+										"id": "rzsMGmL8ba4akTbsGv2lb",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/6",
+												"isExpression": false
+											},
+											"action": {
+												"value": "activate",
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									},
+									{
+										"id": "msAftJEc7gziUFJA2Vk0q",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"up": [
+									{
+										"id": "B0ur3n32Kjv6hhDOXIX6i",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								]
+							},
+							"options": {
+								"runWhileHeld": [
+									600,
+									3000
+								]
+							}
+						}
+					},
+					"localVariables": [
+						{
+							"id": "bwzIYu-L0i1czikd5mP0c",
+							"definitionId": "user_value",
+							"connectionId": "internal",
+							"options": {
+								"persist_value": {
+									"isExpression": false,
+									"value": false
+								},
+								"startup_value": {
+									"value": "0",
+									"isExpression": false
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [],
+							"variableName": "HeldNow",
+							"children": {}
+						}
+					]
+				},
+				"1": {
+					"type": "button-layered",
+					"style": {
+						"layers": [
+							{
+								"id": "canvas",
+								"name": "Canvas",
+								"usage": "auto",
+								"type": "canvas",
+								"decoration": {
+									"value": "border",
+									"isExpression": false
+								},
+								"showStatusIcons": {
+									"value": "default",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "box0",
+								"name": "Background",
+								"usage": "auto",
+								"type": "box",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 0,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 100,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"color": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderWidth": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderColor": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderPosition": {
+									"value": "inside",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "text0",
+								"name": "Label",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 49,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 47,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "Master\\nMorning",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "top",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 50,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": false,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							},
+							{
+								"id": "Sl2THdAsw3YzHS-KcFhrs",
+								"name": "Icon",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 4,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 52,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "☀",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 100,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": true,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							}
+						]
+					},
+					"options": {
+						"stepProgression": "auto",
+						"stepExpression": "",
+						"rotaryActions": false,
+						"canModifyStyleInApis": false,
+						"notes": ""
+					},
+					"feedbacks": [
+						{
+							"id": "7EusdO0uUL-BJdmwSXmeF",
+							"definitionId": "check_expression",
+							"connectionId": "internal",
+							"options": {
+								"expression": {
+									"value": "$(Caseta1:scene_mbr_morning_active) == 1 && $(local:HeldNow) == 0",
+									"isExpression": true
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [
+								{
+									"overrideId": "Vx8fY-b2RwTnPf5RPNfPS",
+									"elementId": "text0",
+									"elementProperty": "color",
+									"override": {
+										"isExpression": false,
+										"value": 16777215
+									}
+								},
+								{
+									"overrideId": "SjJVIVGsuVxOA1msBvPCK",
+									"elementId": "box0",
+									"elementProperty": "color",
+									"override": {
+										"value": 3881729,
+										"isExpression": false
+									}
+								}
+							],
+							"children": {}
+						},
+						{
+							"id": "9Ptkooi4XVwfRxn9EZ2Gi",
+							"definitionId": "variable_value",
+							"connectionId": "internal",
+							"options": {
+								"variable": {
+									"value": "local:HeldNow",
+									"isExpression": false
+								},
+								"op": {
+									"isExpression": false,
+									"value": "eq"
+								},
+								"value": {
+									"value": "1",
+									"isExpression": false
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [
+								{
+									"overrideId": "mXwH8UIKQ2c-Bnvj4ICb0",
+									"elementId": "text0",
+									"elementProperty": "color",
+									"override": {
+										"value": 3355392,
+										"isExpression": false
+									}
+								},
+								{
+									"overrideId": "W-TJgF7Mfsu-KwrcCs1RR",
+									"elementId": "box0",
+									"elementProperty": "color",
+									"override": {
+										"value": 16777215,
+										"isExpression": false
+									}
+								},
+								{
+									"overrideId": "vadY7l87D8VQwmtKTlMlg",
+									"elementId": "Sl2THdAsw3YzHS-KcFhrs",
+									"elementProperty": "color",
+									"override": {
+										"value": 3355392,
+										"isExpression": false
+									}
+								}
+							],
+							"children": {}
+						}
+					],
+					"steps": {
+						"0": {
+							"action_sets": {
+								"600": [
+									{
+										"id": "lE-PAcv4b7g5Od6Vj-WWJ",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "1",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"601": [
+									{
+										"id": "w6i5shxZVUl-_ORgJmH3p",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									},
+									{
+										"id": "gzqZE_UhsmpGP_alSI6XG",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/9",
+												"isExpression": false
+											},
+											"action": {
+												"value": "off",
+												"isExpression": false
+											},
+											"fade_time_off": {
+												"value": 0.75,
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									}
+								],
+								"3000": [
+									{
+										"id": "0_7u6CmW_D70Xj_V82Sxz",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"3001": [
+									{
+										"id": "3iDr3ltTMVmYEXnULZdQ2",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"down": [
+									{
+										"id": "I7V7P1HiUThiJ7HDZ5jsn",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/9",
+												"isExpression": false
+											},
+											"action": {
+												"value": "activate",
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									},
+									{
+										"id": "XKwJCeKyf5-WYlXzc3BXg",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"up": [
+									{
+										"id": "DKXgFxx0XUzQsM2Q8RJvE",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								]
+							},
+							"options": {
+								"runWhileHeld": [
+									600,
+									3000
+								]
+							}
+						}
+					},
+					"localVariables": [
+						{
+							"id": "onas-F5l0rnB5ac94IJIm",
+							"definitionId": "user_value",
+							"connectionId": "internal",
+							"options": {
+								"persist_value": {
+									"isExpression": false,
+									"value": false
+								},
+								"startup_value": {
+									"value": "0",
+									"isExpression": false
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [],
+							"variableName": "HeldNow",
+							"children": {}
+						}
+					]
+				},
+				"2": {
+					"type": "button-layered",
+					"style": {
+						"layers": [
+							{
+								"id": "canvas",
+								"name": "Canvas",
+								"usage": "auto",
+								"type": "canvas",
+								"decoration": {
+									"value": "border",
+									"isExpression": false
+								},
+								"showStatusIcons": {
+									"value": "default",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "box0",
+								"name": "Background",
+								"usage": "auto",
+								"type": "box",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 0,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 100,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"color": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderWidth": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderColor": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderPosition": {
+									"value": "inside",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "text0",
+								"name": "Label",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 49,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 47,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "Master\\nOff",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "top",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 50,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": false,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							},
+							{
+								"id": "Sl2THdAsw3YzHS-KcFhrs",
+								"name": "Icon",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 4,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 52,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "⏻",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 100,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": true,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							}
+						]
+					},
+					"options": {
+						"stepProgression": "auto",
+						"stepExpression": "",
+						"rotaryActions": false,
+						"canModifyStyleInApis": false,
+						"notes": ""
+					},
+					"feedbacks": [],
+					"steps": {
+						"0": {
+							"action_sets": {
+								"down": [
+									{
+										"id": "V9hhyLEMQd4KJMFBinod1",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/11",
+												"isExpression": false
+											},
+											"action": {
+												"value": "activate",
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									}
+								],
+								"up": []
+							},
+							"options": {
+								"runWhileHeld": []
+							}
+						}
+					},
+					"localVariables": []
+				}
+			},
+			"1": {
+				"0": {
+					"type": "button-layered",
+					"style": {
+						"layers": [
+							{
+								"id": "canvas",
+								"name": "Canvas",
+								"usage": "auto",
+								"type": "canvas",
+								"decoration": {
+									"value": "border",
+									"isExpression": false
+								},
+								"showStatusIcons": {
+									"value": "default",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "box0",
+								"name": "Background",
+								"usage": "auto",
+								"type": "box",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 0,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 100,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"color": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderWidth": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderColor": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderPosition": {
+									"value": "inside",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "text0",
+								"name": "Label",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 49,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 47,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "Pathway\\nFull",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "top",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 50,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": false,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							},
+							{
+								"id": "Sl2THdAsw3YzHS-KcFhrs",
+								"name": "Icon",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 4,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 52,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "↝",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 100,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": true,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							}
+						]
+					},
+					"options": {
+						"stepProgression": "auto",
+						"stepExpression": "",
+						"rotaryActions": false,
+						"canModifyStyleInApis": false,
+						"notes": ""
+					},
+					"feedbacks": [
+						{
+							"id": "BMHvmrKTK_59SPPiP3zgE",
+							"definitionId": "check_expression",
+							"connectionId": "internal",
+							"options": {
+								"expression": {
+									"value": "$(Caseta1:scene_pathway_full_active) == 1 && $(local:HeldNow) == 0",
+									"isExpression": true
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [
+								{
+									"overrideId": "YSAOJ6ig_ZSfjQEMbfZ4D",
+									"elementId": "text0",
+									"elementProperty": "color",
+									"override": {
+										"isExpression": false,
+										"value": 16777215
+									}
+								},
+								{
+									"overrideId": "SkbAV3PTZCBaaoRE62-0d",
+									"elementId": "box0",
+									"elementProperty": "color",
+									"override": {
+										"value": 3881729,
+										"isExpression": false
+									}
+								}
+							],
+							"children": {}
+						},
+						{
+							"id": "vwC4M57KxFWwiaWBLNRHK",
+							"definitionId": "variable_value",
+							"connectionId": "internal",
+							"options": {
+								"variable": {
+									"value": "local:HeldNow",
+									"isExpression": false
+								},
+								"op": {
+									"isExpression": false,
+									"value": "eq"
+								},
+								"value": {
+									"value": "1",
+									"isExpression": false
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [
+								{
+									"overrideId": "DSdfzJw0JyqhYaoOyslbO",
+									"elementId": "text0",
+									"elementProperty": "color",
+									"override": {
+										"value": 3355392,
+										"isExpression": false
+									}
+								},
+								{
+									"overrideId": "WwBoE3ww9_AYOwobBbdM5",
+									"elementId": "box0",
+									"elementProperty": "color",
+									"override": {
+										"value": 16777215,
+										"isExpression": false
+									}
+								},
+								{
+									"overrideId": "OmZfwz_Xwc0tFgbDUrxZp",
+									"elementId": "Sl2THdAsw3YzHS-KcFhrs",
+									"elementProperty": "color",
+									"override": {
+										"value": 3355392,
+										"isExpression": false
+									}
+								}
+							],
+							"children": {}
+						}
+					],
+					"steps": {
+						"0": {
+							"action_sets": {
+								"600": [
+									{
+										"id": "G8u9HD6GdVP23yG5tobi5",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "1",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"601": [
+									{
+										"id": "l9XxNUylTs1Avtgr0FHr6",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									},
+									{
+										"id": "VR4D_QFLcAEgCND7P5SJN",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/12",
+												"isExpression": false
+											},
+											"action": {
+												"value": "off",
+												"isExpression": false
+											},
+											"fade_time_off": {
+												"value": 0.75,
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									}
+								],
+								"3000": [
+									{
+										"id": "WzXMiSLoZqixSW89qYJoK",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"3001": [
+									{
+										"id": "wxryH9lGrhksAj0RKXcja",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"down": [
+									{
+										"id": "iJ8BKzUkTYSS63uHpjBbK",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/12",
+												"isExpression": false
+											},
+											"action": {
+												"value": "activate",
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									},
+									{
+										"id": "IogZriERWu476KUBwImsG",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"up": [
+									{
+										"id": "mWp4_Y_HH7UNihuovtrwO",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								]
+							},
+							"options": {
+								"runWhileHeld": [
+									600,
+									3000
+								]
+							}
+						}
+					},
+					"localVariables": [
+						{
+							"id": "D0OYPWQ9eCwCZ2j-KWDOK",
+							"definitionId": "user_value",
+							"connectionId": "internal",
+							"options": {
+								"persist_value": {
+									"isExpression": false,
+									"value": false
+								},
+								"startup_value": {
+									"value": "0",
+									"isExpression": false
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [],
+							"variableName": "HeldNow",
+							"children": {}
+						}
+					]
+				},
+				"1": {
+					"type": "button-layered",
+					"style": {
+						"layers": [
+							{
+								"id": "canvas",
+								"name": "Canvas",
+								"usage": "auto",
+								"type": "canvas",
+								"decoration": {
+									"value": "border",
+									"isExpression": false
+								},
+								"showStatusIcons": {
+									"value": "default",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "box0",
+								"name": "Background",
+								"usage": "auto",
+								"type": "box",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 0,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 100,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"color": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderWidth": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderColor": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderPosition": {
+									"value": "inside",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "text0",
+								"name": "Label",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 49,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 47,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "Pathway\\nMinimal",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "top",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 50,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": false,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							},
+							{
+								"id": "Sl2THdAsw3YzHS-KcFhrs",
+								"name": "Icon",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 4,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 52,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "↝",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 100,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": true,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							}
+						]
+					},
+					"options": {
+						"stepProgression": "auto",
+						"stepExpression": "",
+						"rotaryActions": false,
+						"canModifyStyleInApis": false,
+						"notes": ""
+					},
+					"feedbacks": [
+						{
+							"id": "lDrwFwyf42_c4H7KJjVQG",
+							"definitionId": "check_expression",
+							"connectionId": "internal",
+							"options": {
+								"expression": {
+									"value": "$(Caseta1:scene_pathway_minimal_active) == 1 && $(local:HeldNow) == 0",
+									"isExpression": true
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [
+								{
+									"overrideId": "5LCeIaqRJTLFkBj9YwxOI",
+									"elementId": "text0",
+									"elementProperty": "color",
+									"override": {
+										"isExpression": false,
+										"value": 16777215
+									}
+								},
+								{
+									"overrideId": "hCgkHLWqVcleHS6dWuyPZ",
+									"elementId": "box0",
+									"elementProperty": "color",
+									"override": {
+										"value": 3881729,
+										"isExpression": false
+									}
+								}
+							],
+							"children": {}
+						},
+						{
+							"id": "JDJY40vDQX3y1-qS7Rw7C",
+							"definitionId": "variable_value",
+							"connectionId": "internal",
+							"options": {
+								"variable": {
+									"value": "local:HeldNow",
+									"isExpression": false
+								},
+								"op": {
+									"isExpression": false,
+									"value": "eq"
+								},
+								"value": {
+									"value": "1",
+									"isExpression": false
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [
+								{
+									"overrideId": "23PgF9QqphAYMugjQsd2K",
+									"elementId": "text0",
+									"elementProperty": "color",
+									"override": {
+										"value": 3355392,
+										"isExpression": false
+									}
+								},
+								{
+									"overrideId": "2fmltwQAARCcFljmypKRW",
+									"elementId": "box0",
+									"elementProperty": "color",
+									"override": {
+										"value": 16777215,
+										"isExpression": false
+									}
+								},
+								{
+									"overrideId": "AE16sECT_qmucKl6HGtKl",
+									"elementId": "Sl2THdAsw3YzHS-KcFhrs",
+									"elementProperty": "color",
+									"override": {
+										"value": 3355392,
+										"isExpression": false
+									}
+								}
+							],
+							"children": {}
+						}
+					],
+					"steps": {
+						"0": {
+							"action_sets": {
+								"600": [
+									{
+										"id": "N35XCQ8qO-jlNJRGBWTIi",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "1",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"601": [
+									{
+										"id": "IHnv3pfouq6Wk-e4lB47H",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									},
+									{
+										"id": "kNcvwAbcr8kkp5BmhVJtt",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/13",
+												"isExpression": false
+											},
+											"action": {
+												"value": "off",
+												"isExpression": false
+											},
+											"fade_time_off": {
+												"value": 0.75,
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									}
+								],
+								"3000": [
+									{
+										"id": "82mOXTTixoOYwwT4B0egB",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"3001": [
+									{
+										"id": "vqJZqBY_8CKnF7bTwH2Oe",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"down": [
+									{
+										"id": "IRkn0IS7cyXCzJnCgjy6Y",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/13",
+												"isExpression": false
+											},
+											"action": {
+												"value": "activate",
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									},
+									{
+										"id": "_G5T5l_vQX_JpVEWkIAzI",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								],
+								"up": [
+									{
+										"id": "9VfoI6SKfRhl9NBveJ1L4",
+										"definitionId": "local_variable_set_value",
+										"connectionId": "internal",
+										"options": {
+											"location": {
+												"isExpression": false,
+												"value": "$(this:page)/$(this:row)/$(this:column)"
+											},
+											"name": {
+												"value": "HeldNow",
+												"isExpression": false
+											},
+											"value": {
+												"value": "0",
+												"isExpression": false
+											}
+										},
+										"type": "action",
+										"children": {}
+									}
+								]
+							},
+							"options": {
+								"runWhileHeld": [
+									600,
+									3000
+								]
+							}
+						}
+					},
+					"localVariables": [
+						{
+							"id": "JI5aHenyMN5qK5pXXwZu1",
+							"definitionId": "user_value",
+							"connectionId": "internal",
+							"options": {
+								"persist_value": {
+									"isExpression": false,
+									"value": false
+								},
+								"startup_value": {
+									"value": "0",
+									"isExpression": false
+								}
+							},
+							"type": "feedback",
+							"isInverted": {
+								"value": false,
+								"isExpression": false
+							},
+							"styleOverrides": [],
+							"variableName": "HeldNow",
+							"children": {}
+						}
+					]
+				}
+			},
+			"2": {
+				"0": {
+					"type": "button-layered",
+					"style": {
+						"layers": [
+							{
+								"id": "canvas",
+								"name": "Canvas",
+								"usage": "auto",
+								"type": "canvas",
+								"decoration": {
+									"value": "border",
+									"isExpression": false
+								},
+								"showStatusIcons": {
+									"value": "default",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "box0",
+								"name": "Background",
+								"usage": "auto",
+								"type": "box",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 0,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 100,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"color": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderWidth": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderColor": {
+									"value": 0,
+									"isExpression": false
+								},
+								"borderPosition": {
+									"value": "inside",
+									"isExpression": false
+								}
+							},
+							{
+								"id": "text0",
+								"name": "Label",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 49,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 47,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "All\\nOff",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "top",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 50,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": false,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							},
+							{
+								"id": "Sl2THdAsw3YzHS-KcFhrs",
+								"name": "Icon",
+								"usage": "auto",
+								"type": "text",
+								"enabled": {
+									"value": true,
+									"isExpression": false
+								},
+								"opacity": {
+									"value": 100,
+									"isExpression": false
+								},
+								"x": {
+									"value": 0,
+									"isExpression": false
+								},
+								"y": {
+									"value": 4,
+									"isExpression": false
+								},
+								"width": {
+									"value": 100,
+									"isExpression": false
+								},
+								"height": {
+									"value": 52,
+									"isExpression": false
+								},
+								"rotation": {
+									"value": 0,
+									"isExpression": false
+								},
+								"text": {
+									"value": "⏻",
+									"isExpression": false
+								},
+								"color": {
+									"value": 16777215,
+									"isExpression": false
+								},
+								"halign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"valign": {
+									"value": "center",
+									"isExpression": false
+								},
+								"fontsize": {
+									"value": 100,
+									"isExpression": false
+								},
+								"fontsizeAllowShrink": {
+									"value": true,
+									"isExpression": false
+								},
+								"font": {
+									"value": "companion-sans",
+									"isExpression": false
+								},
+								"outlineColor": {
+									"value": 4278190080,
+									"isExpression": false
+								}
+							}
+						]
+					},
+					"options": {
+						"stepProgression": "auto",
+						"stepExpression": "",
+						"rotaryActions": false,
+						"canModifyStyleInApis": false,
+						"notes": ""
+					},
+					"feedbacks": [],
+					"steps": {
+						"0": {
+							"action_sets": {
+								"down": [
+									{
+										"id": "Sw15V3hqfZ1M2WbAmMxTL",
+										"definitionId": "trigger_scene",
+										"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+										"options": {
+											"scene": {
+												"value": "/virtualbutton/7",
+												"isExpression": false
+											},
+											"action": {
+												"value": "activate",
+												"isExpression": false
+											}
+										},
+										"upgradeIndex": -1,
+										"type": "action"
+									}
+								],
+								"up": []
+							},
+							"options": {
+								"runWhileHeld": []
+							}
+						}
+					},
+					"localVariables": []
+				},
+				"3": {
+					"type": "pagedown"
+				},
+				"4": {
+					"type": "pageup"
+				}
+			}
+		},
+		"gridSize": {
+			"minColumn": 0,
+			"maxColumn": 4,
+			"minRow": 0,
+			"maxRow": 2
+		}
+	},
+	"instances": {
+		"AfzmaKaWqt3TFs8k2uqDe": {
+			"moduleInstanceType": "connection",
+			"moduleId": "lutron-caseta-advanced",
+			"moduleVersionId": "dev",
+			"updatePolicy": "stable",
+			"sortOrder": 0,
+			"label": "Caseta1",
+			"isFirstInit": false,
+			"config": {},
+			"lastUpgradeIndex": -1,
+			"enabled": true
+		}
+	},
+	"connectionCollections": [],
+	"oldPageNumber": 1,
+	"imageLibrary": [],
+	"imageLibraryCollections": []
+}
