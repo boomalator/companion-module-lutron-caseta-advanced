@@ -1,0 +1,173 @@
+[
+	{
+		"serial": 54477563,
+		"area": "Downstairs",
+		"name": "Den Credenza Lamps",
+		"deviceType": "PlugInDimmer",
+		"variableId": "downstairs_den_credenza_lamps_brightness",
+		"roomVariableSlug": "downstairs",
+		"buttonLines": ["Den", "Credenza"]
+	},
+	{
+		"serial": 21099307,
+		"area": "Downstairs",
+		"name": "Den Desk Ceiling",
+		"deviceType": "WallDimmer",
+		"variableId": "downstairs_den_desk_ceiling_brightness",
+		"roomVariableSlug": "downstairs",
+		"buttonLines": ["Den", "Ceiling"]
+	},
+	{
+		"serial": 38014726,
+		"area": "Downstairs",
+		"name": "Den Window Lights",
+		"deviceType": "WallDimmer",
+		"variableId": "downstairs_den_window_lights_brightness",
+		"roomVariableSlug": "downstairs",
+		"buttonLines": ["Den", "Window"]
+	},
+	{
+		"serial": 106337572,
+		"area": "Downstairs",
+		"name": "Entry Area Lights",
+		"deviceType": "WallDimmer",
+		"variableId": "downstairs_entry_area_lights_brightness",
+		"roomVariableSlug": "downstairs",
+		"buttonLines": ["Entry", "Area"]
+	},
+	{
+		"serial": 120683884,
+		"area": "Downstairs",
+		"name": "TV Ceiling Lights",
+		"deviceType": "WallDimmer",
+		"variableId": "downstairs_tv_ceiling_lights_brightness",
+		"roomVariableSlug": "downstairs",
+		"buttonLines": ["Dn TV", "Ceiling"]
+	},
+	{
+		"serial": 65453565,
+		"area": "Main Floor",
+		"name": "Dining Table Lights",
+		"deviceType": "WallDimmer",
+		"variableId": "main_floor_dining_table_lights_brightness",
+		"roomVariableSlug": "main_floor",
+		"buttonLines": ["Dining", "Table"]
+	},
+	{
+		"serial": 65453559,
+		"area": "Main Floor",
+		"name": "Entry Ceiling",
+		"deviceType": "WallDimmer",
+		"variableId": "main_floor_entry_ceiling_brightness",
+		"roomVariableSlug": "main_floor",
+		"buttonLines": ["Entry", "Ceiling"]
+	},
+	{
+		"serial": 65112936,
+		"area": "Main Floor",
+		"name": "Hall Lights",
+		"deviceType": "WallDimmer",
+		"variableId": "main_floor_hall_lights_brightness",
+		"roomVariableSlug": "main_floor",
+		"buttonLines": ["Hall", "Lights"]
+	},
+	{
+		"serial": 34236706,
+		"area": "Main Floor",
+		"name": "Kitchen Lights",
+		"deviceType": "WallDimmer",
+		"variableId": "main_floor_kitchen_lights_brightness",
+		"roomVariableSlug": "main_floor",
+		"buttonLines": ["Kitchen", "Lights"]
+	},
+	{
+		"serial": 19383721,
+		"area": "Main Floor",
+		"name": "Living Room Lamp",
+		"deviceType": "PlugInDimmer",
+		"variableId": "main_floor_living_room_lamp_brightness",
+		"roomVariableSlug": "main_floor",
+		"buttonLines": ["Living", "Lamp"]
+	},
+	{
+		"serial": 19150783,
+		"area": "Main Floor",
+		"name": "Mantle Lamps",
+		"deviceType": "PlugInDimmer",
+		"variableId": "main_floor_mantle_lamps_brightness",
+		"roomVariableSlug": "main_floor",
+		"buttonLines": ["Mantle", "Lamps"]
+	},
+	{
+		"serial": 120927407,
+		"area": "Main Floor",
+		"name": "TV Ceiling",
+		"deviceType": "WallDimmer",
+		"variableId": "main_floor_tv_ceiling_brightness",
+		"roomVariableSlug": "main_floor",
+		"buttonLines": ["Main TV", "Ceiling"]
+	},
+	{
+		"serial": 106633209,
+		"area": "Main Floor",
+		"name": "Upstairs Ceiling",
+		"deviceType": "WallDimmer",
+		"variableId": "main_floor_upstairs_ceiling_brightness",
+		"roomVariableSlug": "main_floor",
+		"buttonLines": ["Upstairs", "Ceiling"]
+	},
+	{
+		"serial": 106633233,
+		"area": "Master Bedroom",
+		"name": "Bathroom Light",
+		"deviceType": "WallDimmer",
+		"variableId": "master_bedroom_bathroom_light_brightness",
+		"roomVariableSlug": "master_bedroom",
+		"buttonLines": ["Master", "Bathroom"]
+	},
+	{
+		"serial": 65453566,
+		"area": "Master Bedroom",
+		"name": "Main Lights",
+		"deviceType": "WallDimmer",
+		"variableId": "master_bedroom_main_lights_brightness",
+		"roomVariableSlug": "master_bedroom",
+		"buttonLines": ["Master", "Main"]
+	},
+	{
+		"serial": 54404506,
+		"area": "Master Bedroom",
+		"name": "Table Lamp",
+		"deviceType": "PlugInDimmer",
+		"variableId": "master_bedroom_table_lamp_brightness",
+		"roomVariableSlug": "master_bedroom",
+		"buttonLines": ["Master", "Table"]
+	},
+	{
+		"serial": 49780740,
+		"area": "Master Bedroom",
+		"name": "Vanity Light",
+		"deviceType": "WallDimmer",
+		"variableId": "master_bedroom_vanity_light_brightness",
+		"roomVariableSlug": "master_bedroom",
+		"buttonLines": ["Master", "Vanity"]
+	},
+	{
+		"serial": 57656360,
+		"area": "Upstairs",
+		"name": "Craft Ceiling Front Lights",
+		"deviceType": "WallDimmer",
+		"variableId": "upstairs_craft_ceiling_front_lights_brightness",
+		"roomVariableSlug": "upstairs",
+		"buttonLines": ["Craft", "Front"]
+	},
+	{
+		"serial": 21099309,
+		"area": "Upstairs",
+		"name": "Craft Room Inner Lights",
+		"deviceType": "WallDimmer",
+		"variableId": "upstairs_craft_room_inner_lights_brightness",
+		"roomVariableSlug": "upstairs",
+		"buttonLines": ["Craft", "Inner"]
+	}
+]

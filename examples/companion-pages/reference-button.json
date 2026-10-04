@@ -1,0 +1,762 @@
+{
+	"type": "button-layered",
+	"style": {
+		"layers": [
+			{
+				"id": "canvas",
+				"name": "Canvas",
+				"usage": "auto",
+				"type": "canvas",
+				"decoration": {
+					"value": "border",
+					"isExpression": false
+				},
+				"showStatusIcons": {
+					"value": "default",
+					"isExpression": false
+				}
+			},
+			{
+				"id": "box0",
+				"name": "Background",
+				"usage": "auto",
+				"type": "box",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 0,
+					"isExpression": false
+				},
+				"y": {
+					"value": 0,
+					"isExpression": false
+				},
+				"width": {
+					"value": 100,
+					"isExpression": false
+				},
+				"height": {
+					"value": 100,
+					"isExpression": false
+				},
+				"rotation": {
+					"value": 0,
+					"isExpression": false
+				},
+				"color": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderWidth": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderColor": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderPosition": {
+					"value": "inside",
+					"isExpression": false
+				}
+			},
+			{
+				"id": "text0",
+				"name": "Text",
+				"usage": "auto",
+				"type": "text",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 0,
+					"isExpression": false
+				},
+				"y": {
+					"value": 0,
+					"isExpression": false
+				},
+				"width": {
+					"value": 100,
+					"isExpression": false
+				},
+				"height": {
+					"value": 100,
+					"isExpression": false
+				},
+				"rotation": {
+					"value": 0,
+					"isExpression": false
+				},
+				"text": {
+					"value": "Den\\nWindow\\n$(Caseta1:downstairs_den_window_lights_brightness)",
+					"isExpression": false
+				},
+				"color": {
+					"value": 16777215,
+					"isExpression": false
+				},
+				"halign": {
+					"value": "center",
+					"isExpression": false
+				},
+				"valign": {
+					"value": "center",
+					"isExpression": false
+				},
+				"fontsize": {
+					"value": 20,
+					"isExpression": false
+				},
+				"fontsizeAllowShrink": {
+					"value": true,
+					"isExpression": false
+				},
+				"font": {
+					"value": "companion-sans",
+					"isExpression": false
+				},
+				"outlineColor": {
+					"value": 4278190080,
+					"isExpression": false
+				}
+			},
+			{
+				"id": "Mp7iFFgz7-gyvDaSDZy52",
+				"name": "Gauge",
+				"usage": "auto",
+				"type": "gauge",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 0,
+					"isExpression": false
+				},
+				"y": {
+					"value": 0,
+					"isExpression": false
+				},
+				"width": {
+					"value": 10,
+					"isExpression": false
+				},
+				"height": {
+					"value": 100,
+					"isExpression": false
+				},
+				"rotation": {
+					"value": 0,
+					"isExpression": false
+				},
+				"value": {
+					"value": "$(Caseta1:downstairs_den_window_lights_brightness)",
+					"isExpression": true
+				},
+				"min": {
+					"value": 0,
+					"isExpression": false
+				},
+				"max": {
+					"value": 100,
+					"isExpression": false
+				},
+				"origin": {
+					"value": null,
+					"isExpression": false
+				},
+				"symmetric": {
+					"value": false,
+					"isExpression": false
+				},
+				"orientation": {
+					"value": "vertical",
+					"isExpression": false
+				},
+				"reverse": {
+					"value": false,
+					"isExpression": false
+				},
+				"trackWidth": {
+					"value": 100,
+					"isExpression": false
+				},
+				"startAngle": {
+					"value": 0,
+					"isExpression": false
+				},
+				"endAngle": {
+					"value": 360,
+					"isExpression": false
+				},
+				"ringWidth": {
+					"value": 20,
+					"isExpression": false
+				},
+				"roundedEnds": {
+					"value": true,
+					"isExpression": false
+				},
+				"fillEnabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"multiColour": {
+					"value": false,
+					"isExpression": false
+				},
+				"stops": {
+					"value": [
+						{
+							"_id": {
+								"value": "ZguzMNlOQCTPKCHYA3_TI",
+								"isExpression": false
+							},
+							"value": {
+								"value": 0,
+								"isExpression": false
+							},
+							"color": {
+								"value": 65280,
+								"isExpression": false
+							},
+							"gradient": {
+								"value": false,
+								"isExpression": false
+							}
+						}
+					],
+					"isExpression": false
+				},
+				"markerEnabled": {
+					"value": false,
+					"isExpression": false
+				},
+				"markerColor": {
+					"value": 16777215,
+					"isExpression": false
+				},
+				"markerWidth": {
+					"value": 15,
+					"isExpression": false
+				},
+				"trackStyle": {
+					"value": "transparent",
+					"isExpression": false
+				},
+				"trackAmount": {
+					"value": 23,
+					"isExpression": false
+				}
+			},
+			{
+				"id": "ojCUtjPSEOzu5qE7fIH3L",
+				"name": "Circle",
+				"usage": "auto",
+				"type": "circle",
+				"enabled": {
+					"value": true,
+					"isExpression": false
+				},
+				"opacity": {
+					"value": 100,
+					"isExpression": false
+				},
+				"x": {
+					"value": 78,
+					"isExpression": false
+				},
+				"y": {
+					"value": 78,
+					"isExpression": false
+				},
+				"width": {
+					"value": 12,
+					"isExpression": false
+				},
+				"height": {
+					"value": 12,
+					"isExpression": false
+				},
+				"color": {
+					"value": 23807,
+					"isExpression": false
+				},
+				"startAngle": {
+					"value": 0,
+					"isExpression": false
+				},
+				"endAngle": {
+					"value": 360,
+					"isExpression": false
+				},
+				"drawSlice": {
+					"value": false,
+					"isExpression": false
+				},
+				"borderWidth": {
+					"value": 0,
+					"isExpression": false
+				},
+				"borderColor": {
+					"value": 16777215,
+					"isExpression": false
+				},
+				"borderPosition": {
+					"value": "center",
+					"isExpression": false
+				},
+				"borderOnlyArc": {
+					"value": false,
+					"isExpression": false
+				}
+			}
+		]
+	},
+	"options": {
+		"stepProgression": "auto",
+		"stepExpression": "",
+		"rotaryActions": false,
+		"canModifyStyleInApis": false,
+		"notes": ""
+	},
+	"feedbacks": [
+		{
+			"id": "xQ2OXF9YeVT-1WtxwK3Lm",
+			"definitionId": "check_expression",
+			"connectionId": "internal",
+			"options": {
+				"expression": {
+					"value": "$(Caseta1:downstairs_den_window_lights_brightness) > 0 ",
+					"isExpression": true
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [
+				{
+					"overrideId": "2BsGii7hdQknmqqX53SpH",
+					"elementId": "text0",
+					"elementProperty": "color",
+					"override": {
+						"isExpression": false,
+						"value": 16777215
+					}
+				},
+				{
+					"overrideId": "YNmrUF1S8UrUxWy3Hem5F",
+					"elementId": "box0",
+					"elementProperty": "color",
+					"override": {
+						"value": 3881729,
+						"isExpression": false
+					}
+				}
+			],
+			"children": {}
+		},
+		{
+			"id": "Zj6mtIT0w4KU8XRgkYixM",
+			"definitionId": "check_expression",
+			"connectionId": "internal",
+			"options": {
+				"expression": {
+					"value": "$(Caseta1:downstairs_den_window_lights_brightness) == 0 ",
+					"isExpression": true
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [
+				{
+					"overrideId": "X7AN9wjNEVjJ2oGMp539L",
+					"elementId": "Mp7iFFgz7-gyvDaSDZy52",
+					"elementProperty": "enabled",
+					"override": {
+						"value": "",
+						"isExpression": false
+					}
+				}
+			],
+			"children": {}
+		},
+		{
+			"id": "2aLq5VIhk3OD5clJFcUGV",
+			"definitionId": "check_expression",
+			"connectionId": "internal",
+			"options": {
+				"expression": {
+					"value": "$(Caseta1:room_downstairs_selected_name) != \"Den Window Lights\"",
+					"isExpression": true
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [
+				{
+					"overrideId": "7k1FtaHe3w5iNqd9wpCIa",
+					"elementId": "ojCUtjPSEOzu5qE7fIH3L",
+					"elementProperty": "enabled",
+					"override": {
+						"value": "",
+						"isExpression": false
+					}
+				}
+			],
+			"children": {}
+		},
+		{
+			"id": "jwMYWZ0tPhqx6z-8Qh7Yq",
+			"definitionId": "check_expression",
+			"connectionId": "internal",
+			"options": {
+				"expression": {
+					"value": "$(local:HeldNow) == 1",
+					"isExpression": true
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [
+				{
+					"overrideId": "K89-oVHfrGRCNseQfaAZE",
+					"elementId": "text0",
+					"elementProperty": "color",
+					"override": {
+						"value": 0,
+						"isExpression": false
+					}
+				},
+				{
+					"overrideId": "d4Orp43uWP0VCT1WMDf4T",
+					"elementId": "box0",
+					"elementProperty": "color",
+					"override": {
+						"value": 7237230,
+						"isExpression": false
+					}
+				},
+				{
+					"overrideId": "dFIbvpl5hTYgfqu2EUZ2H",
+					"elementId": "text0",
+					"elementProperty": "text",
+					"override": {
+						"value": "$(Caseta1:downstairs_den_window_lights_brightness) > 0 ? \"RELEASE TO\\nTURN OFF\"  : \"RELEASE TO\\nTURN ON FULL\"",
+						"isExpression": true
+					}
+				}
+			],
+			"children": {}
+		}
+	],
+	"steps": {
+		"0": {
+			"action_sets": {
+				"250": [
+					{
+						"id": "lMTqoG4CdInXVNgzMq0VK",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "1",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				],
+				"251": [
+					{
+						"id": "Ln9guVmDv1wtMBd0-PIlY",
+						"definitionId": "smart_step",
+						"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+						"options": {
+							"device": {
+								"value": 38014726,
+								"isExpression": false
+							},
+							"if_off": {
+								"value": "full",
+								"isExpression": false
+							},
+							"if_on": {
+								"isExpression": false,
+								"value": "off"
+							},
+							"step_percent": {
+								"isExpression": false,
+								"value": 10
+							},
+							"specific_value_percent": {
+								"isExpression": false,
+								"value": 50
+							},
+							"fade_time_on": {
+								"isExpression": false,
+								"value": 0.75
+							},
+							"fade_time_off": {
+								"isExpression": false,
+								"value": 2.5
+							}
+						},
+						"upgradeIndex": -1,
+						"type": "action"
+					},
+					{
+						"id": "OyufhxyQ30Jin-YEMrzhY",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "0",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				],
+				"1200": [
+					{
+						"id": "jJvPclck9Rlp4K4KkXfpo",
+						"definitionId": "ramp_light",
+						"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+						"options": {
+							"device": {
+								"value": 38014726,
+								"isExpression": false
+							},
+							"ramp_mode": {
+								"value": "down",
+								"isExpression": false
+							},
+							"ramp_rate_percent_per_sec": {
+								"value": 18,
+								"isExpression": false
+							},
+							"ramp_tick_ms": {
+								"value": 180,
+								"isExpression": false
+							},
+							"ramp_floor_percent": {
+								"value": 2,
+								"isExpression": false
+							}
+						},
+						"upgradeIndex": -1,
+						"type": "action"
+					},
+					{
+						"id": "jVi4k8GCvEU1BG2nABg1t",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "0",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				],
+				"1201": [
+					{
+						"id": "z_WcGtI3eCha2Y1xlHSps",
+						"definitionId": "ramp_light",
+						"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+						"options": {
+							"device": {
+								"value": 38014726,
+								"isExpression": false
+							},
+							"ramp_mode": {
+								"value": "stop",
+								"isExpression": false
+							},
+							"ramp_rate_percent_per_sec": {
+								"isExpression": false,
+								"value": 30
+							},
+							"ramp_tick_ms": {
+								"isExpression": false,
+								"value": 150
+							},
+							"ramp_floor_percent": {
+								"isExpression": false,
+								"value": 0
+							}
+						},
+						"upgradeIndex": -1,
+						"type": "action"
+					},
+					{
+						"id": "G01BFVEr-OD0Sy8r859EA",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "0",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				],
+				"down": [],
+				"up": [
+					{
+						"id": "g1b4AUU1h-HTPLAYvjSSR",
+						"definitionId": "smart_step",
+						"connectionId": "AfzmaKaWqt3TFs8k2uqDe",
+						"options": {
+							"device": {
+								"value": 38014726,
+								"isExpression": false
+							},
+							"if_off": {
+								"value": "on",
+								"isExpression": false
+							},
+							"if_on": {
+								"value": "nudge_up",
+								"isExpression": false
+							},
+							"step_percent": {
+								"isExpression": false,
+								"value": 10
+							},
+							"specific_value_percent": {
+								"isExpression": false,
+								"value": 50
+							},
+							"fade_time_on": {
+								"isExpression": false,
+								"value": 0.75
+							},
+							"fade_time_off": {
+								"value": 2,
+								"isExpression": false
+							}
+						},
+						"upgradeIndex": -1,
+						"type": "action"
+					},
+					{
+						"id": "TuW9F3OdIhrVvu1iYuRuY",
+						"definitionId": "local_variable_set_value",
+						"connectionId": "internal",
+						"options": {
+							"location": {
+								"isExpression": false,
+								"value": "$(this:page)/$(this:row)/$(this:column)"
+							},
+							"name": {
+								"value": "HeldNow",
+								"isExpression": false
+							},
+							"value": {
+								"value": "0",
+								"isExpression": false
+							}
+						},
+						"type": "action",
+						"children": {}
+					}
+				]
+			},
+			"options": {
+				"runWhileHeld": [1200, 250]
+			}
+		}
+	},
+	"localVariables": [
+		{
+			"id": "S9r7hAhtZbQCwngEmVrGq",
+			"definitionId": "user_value",
+			"connectionId": "internal",
+			"options": {
+				"persist_value": {
+					"isExpression": false,
+					"value": false
+				},
+				"startup_value": {
+					"value": "0",
+					"isExpression": false
+				}
+			},
+			"type": "feedback",
+			"isInverted": {
+				"value": false,
+				"isExpression": false
+			},
+			"styleOverrides": [],
+			"variableName": "HeldNow",
+			"children": {}
+		}
+	]
+}
