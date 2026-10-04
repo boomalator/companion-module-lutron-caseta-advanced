@@ -91,6 +91,7 @@ function BuildSetControlAction(self: ModuleInstance): Record<string, CompanionAc
 						{ id: 'on', label: 'On (Resume Last Level)' },
 						{ id: 'full', label: 'Full (100%)' },
 						{ id: 'off', label: 'Off' },
+						{ id: 'toggle', label: 'Toggle' },
 						{ id: 'value', label: 'Specific Value' },
 						{ id: 'brighten', label: 'Brighten (+X%)' },
 						{ id: 'dim', label: 'Dim (-X%)' },
@@ -119,10 +120,11 @@ function BuildSetControlAction(self: ModuleInstance): Record<string, CompanionAc
 				// Two fields (rather than one shared default) so "turning on" and
 				// "turning off" can have different defaults -- a fast fade up, a
 				// slower fade down. Moot for a switch, but harmless to leave visible.
+				// Toggle shows both, since which one applies depends on the light's state.
 				{
 					id: 'fade_time_on',
 					type: 'number',
-					label: 'Fade Time (seconds)',
+					label: 'Fade Time, Turning On (seconds)',
 					default: 0.75,
 					min: 0,
 					max: 10,
@@ -133,13 +135,13 @@ function BuildSetControlAction(self: ModuleInstance): Record<string, CompanionAc
 				{
 					id: 'fade_time_off',
 					type: 'number',
-					label: 'Fade Time (seconds)',
+					label: 'Fade Time, Turning Off (seconds)',
 					default: 2.5,
 					min: 0,
 					max: 10,
 					step: 0.25,
 					range: true,
-					isVisible: (opts) => opts.mode === 'off',
+					isVisible: (opts) => opts.mode === 'off' || opts.mode === 'toggle',
 				},
 			],
 			callback: async (event) => {
@@ -151,8 +153,9 @@ function BuildSetControlAction(self: ModuleInstance): Record<string, CompanionAc
 				const levelType = getDeviceLevelType(device) ?? 'switch'
 				const mode = event.options.mode as string
 				const level = computeLevelForMode(self, device, levelType, mode, event.options)
-				const fadeTimeValue =
-					((mode === 'off' ? event.options.fade_time_off : event.options.fade_time_on) as number) || 0
+				// Toggle fades by where it ends up: a fade down when it turns the light off.
+				const fadingOff = mode === 'off' || (mode === 'toggle' && level === 0)
+				const fadeTimeValue = ((fadingOff ? event.options.fade_time_off : event.options.fade_time_on) as number) || 0
 
 				await sendLevel(self, device, level, fadeTimeValue)
 			},

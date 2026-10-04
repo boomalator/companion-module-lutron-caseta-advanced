@@ -45,7 +45,7 @@ import {
 	SeedOccupancyVariableValues,
 	type OccupancySensorState,
 } from './occupancy.js'
-import { ClearAllSmartControlState, type SmartControlState } from './smartControl.js'
+import { ClearAllSmartControlState, type SmartControlState } from './ramp.js'
 import {
 	BuildSelectedLightVariableDefinitions,
 	SeedSelectedLightVariableValues,

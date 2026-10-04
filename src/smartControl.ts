@@ -4,14 +4,7 @@ import type { DeviceDefinition } from 'lutron-leap'
 import { getDeviceLevelType, getDeviceLabel } from './deviceTypes.js'
 import { sendLevel, DEFAULT_UNKNOWN_BRIGHTNESS } from './levelControl.js'
 import { markLightSelected } from './selectedLight.js'
-
-// Only a running ramp is stateful. Everything else about a button gesture is
-// timed by Companion itself (see below), so the module keeps no press timers.
-export interface SmartControlState {
-	rampInterval?: ReturnType<typeof setInterval>
-	rampDirection?: 'up' | 'down'
-	rampLevel?: number
-}
+import { RAMP_MODE_CHOICES, startRamp, stopRamp } from './ramp.js'
 
 // Unconditional, atomic actions -- not named "if off do X, if on do Y" combos,
 // which grow combinatorially. Smart Step picks one for when the light is off
@@ -26,12 +19,6 @@ const STEP_ACTION_CHOICES = [
 	{ id: 'none', label: 'Do Nothing' },
 ]
 
-const RAMP_MODE_CHOICES = [
-	{ id: 'up', label: 'Ramp Up' },
-	{ id: 'down', label: 'Ramp Down' },
-	{ id: 'stop', label: 'Stop Ramp' },
-]
-
 // Gesture timing lives in Companion, not here. Companion's duration groups split
 // a button's release by how long it was held, and come in pairs per threshold:
 //   - "Held for N ms" (execute while held): fires once, at N, while still held
@@ -44,11 +31,11 @@ const RAMP_MODE_CHOICES = [
 // This module supplies what the groups do, as two actions:
 //   - Smart Step: one-shot, picks an action by whether the light is currently
 //     off or on (e.g. If Off: On (Last), If On: Off is a toggle)
-//   - Ramp Light: Ramp Up / Ramp Down starts a continuous ramp; Stop Ramp ends it
+//   - Ramp Light: Start Ramp Up / Start Ramp Down starts a continuous ramp; Stop Ramp ends it
 //
 // e.g. Short release: Smart Step (toggle). Held for 250 / Release after 251:
 // UI feedback and a second Smart Step (long press). Held for 1000: Ramp Light
-// (Ramp Up). Release after 1001: Ramp Light (Stop Ramp), reset UI.
+// (Start Ramp Up). Release after 1001: Ramp Light (Stop Ramp), reset UI.
 export function BuildSmartControlActions(self: ModuleInstance): Record<string, CompanionActionDefinition> {
 	const entries = self.devicesOnBridge
 		.map((device) => {
@@ -171,7 +158,7 @@ export function BuildSmartControlActions(self: ModuleInstance): Record<string, C
 					type: 'dropdown',
 					label: 'Ramp',
 					description:
-						'Put Ramp Up/Down in a "Held for" duration group (execute while held), and Stop Ramp in the matching "Release after" group.',
+						'Put Start Ramp Up/Down in a "Held for" duration group (execute while held), and Stop Ramp in the matching "Release after" group.',
 					default: 'up',
 					choices: RAMP_MODE_CHOICES,
 				},
@@ -199,7 +186,8 @@ export function BuildSmartControlActions(self: ModuleInstance): Record<string, C
 					id: 'ramp_floor_percent',
 					type: 'number',
 					label: 'Ramp Floor (%)',
-					description: 'Ramp Down stops here instead of going all the way to 0. Default 0 -- ramps all the way off.',
+					description:
+						'Start Ramp Down stops here instead of going all the way to 0. Default 0 -- ramps all the way off.',
 					range: true,
 					default: 0,
 					min: 0,
@@ -263,52 +251,4 @@ function resolveStepLevel(
 		default:
 			return undefined
 	}
-}
-
-function startRamp(
-	self: ModuleInstance,
-	device: DeviceDefinition,
-	direction: 'up' | 'down',
-	options: CompanionOptionValues,
-): void {
-	const serial = device.SerialNumber
-	stopRamp(self, serial)
-
-	// Only meaningful for Ramp Down -- 0 (default) means "can ramp all the way
-	// off". There's no equivalent ceiling below 100 for Ramp Up.
-	const floor = direction === 'down' ? Math.max(0, Math.min(99, (options.ramp_floor_percent as number) || 0)) : 0
-
-	const current = self.currentLevel[serial] ?? 0
-	if (direction === 'down' && current <= floor) return // already at or below the floor -- nothing to ramp
-
-	const state: SmartControlState = { rampDirection: direction, rampLevel: current }
-	self.smartControlState[serial] = state
-
-	const tickMs = (options.ramp_tick_ms as number) || 200
-	const ratePerSec = (options.ramp_rate_percent_per_sec as number) || 30
-	const perTick = Math.max(1, Math.round((ratePerSec * tickMs) / 1000))
-
-	state.rampInterval = setInterval(() => {
-		const next =
-			direction === 'up'
-				? Math.min(100, (state.rampLevel ?? 0) + perTick)
-				: Math.max(floor, (state.rampLevel ?? 0) - perTick)
-		state.rampLevel = next
-		void sendLevel(self, device, next, 0)
-
-		if (direction === 'up' ? next === 100 : next === floor) stopRamp(self, serial)
-	}, tickMs)
-}
-
-function stopRamp(self: ModuleInstance, serial: string): void {
-	const state = self.smartControlState[serial]
-	if (!state) return
-	if (state.rampInterval) clearInterval(state.rampInterval)
-	delete self.smartControlState[serial]
-}
-
-// Called on module destroy/reconnect so no dangling setInterval outlives the
-// module instance that scheduled it.
-export function ClearAllSmartControlState(self: ModuleInstance): void {
-	Object.keys(self.smartControlState).forEach((serial) => stopRamp(self, serial))
 }

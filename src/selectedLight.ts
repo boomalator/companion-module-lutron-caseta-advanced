@@ -9,6 +9,7 @@ import type { DeviceDefinition, FanSpeedType } from 'lutron-leap'
 import { getDeviceLevelType, isFanDevice, slugify } from './deviceTypes.js'
 import { computeLevelForMode, sendLevel, sendFanSpeed } from './levelControl.js'
 import { FAN_SPEED_CHOICES, FAN_SPEED_PERCENT } from './fanTypes.js'
+import { startRamp, stopRampsInRoom } from './ramp.js'
 
 // The "Room" a control acts on when nothing more specific is selected. Every
 // per-light press updates both its own room's entry *and* this one, so a
@@ -97,11 +98,12 @@ export function SeedSelectedLightVariableValues(self: ModuleInstance): void {
 	Object.keys(self.roomSelectedDeviceSerial).forEach((room) => updateRoomVariables(self, room))
 }
 
-// Fans use the same six modes as lights, mapped onto their 5 discrete speeds
-// instead of a 0-100 level: on resumes Medium if it was off, full/off go to
-// the top/bottom speed, brighten/dim step one speed at a time (the step %
-// option is ignored -- there's no finer resolution than one speed), and
-// value/preset snaps to whichever speed is closest to the requested %.
+// Fans use the same modes as lights (bar the ramps, which a fan can't do), mapped onto
+// their 5 discrete speeds instead of a 0-100 level: on resumes Medium if it was off,
+// toggle flips between Off and that, full/off go to the top/bottom speed, brighten/dim
+// step one speed at a time (the step % option is ignored -- there's no finer
+// resolution than one speed), and value/preset snaps to whichever speed is closest to
+// the requested %.
 function computeFanSpeedForMode(
 	self: ModuleInstance,
 	device: DeviceDefinition,
@@ -114,6 +116,8 @@ function computeFanSpeedForMode(
 	switch (mode) {
 		case 'off':
 			return 'Off'
+		case 'toggle':
+			return current === 'Off' ? 'Medium' : 'Off'
 		case 'full':
 			return 'High'
 		case 'value': {
@@ -132,24 +136,31 @@ function computeFanSpeedForMode(
 	}
 }
 
-// Mirrors the per-device level action's on/full/off/value/brighten/dim modes,
-// but instead of a Device option, takes a Room -- and acts on whichever light
-// was most recently touched in that room (or, for "House", anywhere).
-// Duplicate this action across a room's own page with Room set to that room,
-// or drop one on a multi-room master (phone, etc) left on "House".
+// Mirrors the per-device level action's modes, but instead of a Device option, takes a
+// Room -- and acts on whichever light was most recently touched in that room (or, for
+// "House", anywhere). Duplicate this action across a room's own page with Room set to
+// that room, or drop one on a multi-room master (phone, etc) left on "House".
+//
+// Besides the one-shot modes it can start and stop a ramp on that light, which is a
+// more natural way to dim a selected light than repeated steps: put Start Ramp Up/Down
+// in a "Held for" duration group and Stop Ramp in the matching "Release after" group
+// (see smartControl.ts). Ramps need a dimmer: on a switch or fan they do nothing.
+const RAMP_MODES = ['ramp_up', 'ramp_down']
+
 export function BuildSelectedLightAction(self: ModuleInstance): Record<string, CompanionActionDefinition> {
 	const areas = getControllableAreas(self)
 	if (areas.length === 0) return {}
 
 	return {
 		surface_selected_light_control: {
-			name: 'Selected Light Control (most recently touched light)',
+			name: 'Selected Light Control',
 			options: [
 				{
 					id: 'room',
 					type: 'dropdown',
 					label: 'Room',
-					description: 'House: whatever light was most recently touched anywhere, not just this room.',
+					description:
+						'Acts on the most recently touched light in this room. House: whatever light was most recently touched anywhere, not just this room.',
 					default: HOUSE_WIDE_ROOM,
 					choices: [{ id: HOUSE_WIDE_ROOM, label: 'House' }, ...areas.map((area) => ({ id: area, label: area }))],
 				},
@@ -162,9 +173,13 @@ export function BuildSelectedLightAction(self: ModuleInstance): Record<string, C
 						{ id: 'on', label: 'On (Resume Last Level)' },
 						{ id: 'full', label: 'Full (100%)' },
 						{ id: 'off', label: 'Off' },
+						{ id: 'toggle', label: 'Toggle' },
 						{ id: 'value', label: 'Specific Value / Preset' },
 						{ id: 'brighten', label: 'Brighten (+X%)' },
 						{ id: 'dim', label: 'Dim (-X%)' },
+						{ id: 'ramp_up', label: 'Start Ramp Up' },
+						{ id: 'ramp_down', label: 'Start Ramp Down' },
+						{ id: 'ramp_stop', label: 'Stop Ramp' },
 					],
 				},
 				{
@@ -188,36 +203,87 @@ export function BuildSelectedLightAction(self: ModuleInstance): Record<string, C
 					isVisible: (opts) => opts.mode === 'brighten' || opts.mode === 'dim',
 				},
 				{
+					id: 'ramp_rate_percent_per_sec',
+					type: 'number',
+					label: 'Ramp Rate (%/sec)',
+					default: 30,
+					min: 1,
+					max: 100,
+					isVisible: (opts) => RAMP_MODES.includes(opts.mode as string),
+				},
+				{
+					id: 'ramp_tick_ms',
+					type: 'number',
+					label: 'Ramp Update Interval (ms)',
+					description:
+						'How often the ramp steps. A Lutron zone handles about 6 commands/sec (~160ms each), so faster than that gains nothing. Slower gives bigger, less frequent steps at the same Ramp Rate.',
+					default: 200,
+					min: 50,
+					max: 1000,
+					isVisible: (opts) => RAMP_MODES.includes(opts.mode as string),
+				},
+				{
+					id: 'ramp_floor_percent',
+					type: 'number',
+					label: 'Ramp Floor (%)',
+					description:
+						'Start Ramp Down stops here instead of going all the way to 0. Default 0 -- ramps all the way off.',
+					range: true,
+					default: 0,
+					min: 0,
+					max: 99,
+					isVisible: (opts) => opts.mode === 'ramp_down',
+				},
+				// Toggle shows both fades, since which one applies depends on the light's state.
+				{
 					id: 'fade_time_on',
 					type: 'number',
-					label: 'Fade Time (seconds)',
+					label: 'Fade Time, Turning On (seconds)',
 					default: 0.75,
 					min: 0,
 					max: 10,
 					step: 0.25,
 					range: true,
-					isVisible: (opts) => opts.mode !== 'off',
+					isVisible: (opts) => opts.mode !== 'off' && !String(opts.mode).startsWith('ramp_'),
 				},
 				{
 					id: 'fade_time_off',
 					type: 'number',
-					label: 'Fade Time (seconds)',
+					label: 'Fade Time, Turning Off (seconds)',
 					default: 2.5,
 					min: 0,
 					max: 10,
 					step: 0.25,
 					range: true,
-					isVisible: (opts) => opts.mode === 'off',
+					isVisible: (opts) => opts.mode === 'off' || opts.mode === 'toggle',
 				},
 			],
 			callback: async (event) => {
-				const device = getSelectedDeviceForRoom(self, event.options.room as string)
-				if (!device) {
-					self.log('debug', `Selected Light Control: nothing selected yet for room "${event.options.room}"`)
+				const room = event.options.room as string
+				const mode = event.options.mode as string
+
+				// Stop first, before the "nothing selected" check: the light that was selected when
+				// the ramp started may not be the selected one now, and a ramp must never be left
+				// running. Stops every ramp in the room (every ramp at all for "House").
+				if (mode === 'ramp_stop') {
+					stopRampsInRoom(self, room === HOUSE_WIDE_ROOM ? undefined : room)
 					return
 				}
 
-				const mode = event.options.mode as string
+				const device = getSelectedDeviceForRoom(self, room)
+				if (!device) {
+					self.log('debug', `Selected Light Control: nothing selected yet for room "${room}"`)
+					return
+				}
+
+				if (RAMP_MODES.includes(mode)) {
+					if (getDeviceLevelType(device) !== 'dimmer') {
+						self.log('debug', `Selected Light Control: ${device.Name} is not a dimmer, so it can't ramp`)
+						return
+					}
+					startRamp(self, device, mode === 'ramp_up' ? 'up' : 'down', event.options)
+					return
+				}
 
 				if (isFanDevice(device)) {
 					const speed = computeFanSpeedForMode(self, device, mode, event.options)
@@ -227,8 +293,9 @@ export function BuildSelectedLightAction(self: ModuleInstance): Record<string, C
 
 				const levelType = getDeviceLevelType(device) ?? 'switch'
 				const level = computeLevelForMode(self, device, levelType, mode, event.options)
-				const fadeTimeValue =
-					((mode === 'off' ? event.options.fade_time_off : event.options.fade_time_on) as number) || 0
+				// Toggle fades by where it ends up: a fade down when it turns the light off.
+				const fadingOff = mode === 'off' || (mode === 'toggle' && level === 0)
+				const fadeTimeValue = ((fadingOff ? event.options.fade_time_off : event.options.fade_time_on) as number) || 0
 
 				await sendLevel(self, device, level, fadeTimeValue)
 			},

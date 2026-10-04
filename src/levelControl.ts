@@ -21,6 +21,12 @@ export function computeLevelForMode(
 ): number {
 	const serial = device.SerialNumber
 	switch (mode) {
+		case 'toggle': {
+			// On -> off; off -> back on. A switch is 0/100, a dimmer goes back to the last
+			// non-zero level it had (or a sensible default if it has never been on).
+			if ((self.currentLevel[serial] ?? 0) > 0) return 0
+			return levelType === 'dimmer' ? (self.lastNonZeroLevel[serial] ?? DEFAULT_UNKNOWN_BRIGHTNESS) : 100
+		}
 		case 'off':
 			return 0
 		case 'full':
