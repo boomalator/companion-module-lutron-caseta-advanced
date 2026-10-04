@@ -29,7 +29,9 @@ function createSystemActions(self: ModuleInstance): Record<string, CompanionActi
 				self.log('info', 'Rescanning devices...')
 				try {
 					await self.rescanDevices()
-					await self.refreshSlowExtras()
+					// Scenes, occupancy and scene settings take many round trips, longer than Companion
+					// waits for an action to finish, so they carry on in the background.
+					void self.refreshSlowExtras().catch((err: Error) => self.log('error', `Refresh failed: ${err.message}`))
 				} catch (err) {
 					self.log('error', `Rescan failed: ${(err as Error).message}`)
 				}
@@ -50,8 +52,11 @@ function createSystemActions(self: ModuleInstance): Record<string, CompanionActi
 				self.log('info', 'Refreshing scenes...')
 				await RefreshScenes(self)
 				self.updateActions()
-				await LoadSceneAssignments(self)
-				self.updateVariableDefinitions()
+				// Reading what each scene sets is slower than Companion waits for an action, so it
+				// finishes in the background and the scene variables are rebuilt when it is done.
+				void LoadSceneAssignments(self)
+					.then(() => self.updateVariableDefinitions())
+					.catch((err: Error) => self.log('error', `Failed to load scene settings: ${err.message}`))
 			},
 		},
 	}
