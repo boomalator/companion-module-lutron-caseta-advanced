@@ -4,7 +4,7 @@ An extended fork of [companion-module-lutron-caseta](https://github.com/bitfocus
 
 This extended fork is maintained by B P Hynes. Licensed MIT — see [LICENSE](./LICENSE).
 
-See [HELP.md](./companion/HELP.md)
+See [HELP.md](./companion/HELP.md) for using the module, and [DEVELOPING.md](./DEVELOPING.md) for building it from source and loading it into Companion as a developer module.
 
 ## Getting started
 
