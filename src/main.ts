@@ -33,6 +33,13 @@ import {
 import { BuildFanVariableDefinitions, SeedFanVariableValues, FAN_SPEED_PERCENT } from './fans.js'
 import { RefreshScenes } from './scenes.js'
 import {
+	LoadSceneAssignments,
+	BuildSceneVariableDefinitions,
+	SeedSceneVariableValues,
+	RefreshSceneActive,
+	type SceneAssignment,
+} from './sceneState.js'
+import {
 	SubscribeToOccupancy,
 	BuildOccupancyVariableDefinitions,
 	SeedOccupancyVariableValues,
@@ -68,6 +75,9 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 	fanVariableIds: Record<string, string>
 	fanPercentVariableIds: Record<string, string>
 	scenes: Record<string, VirtualButtonDefinition>
+	sceneAssignments: Record<string, SceneAssignment[]>
+	sceneVariableIds: Record<string, string>
+	sceneActive: Record<string, boolean>
 	occupancySensors: Record<string, OccupancySensorState>
 	occupancyGroupToDevices: Record<string, string[]>
 	smartControlState: Record<string, SmartControlState>
@@ -87,6 +97,9 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		this.discoveredPicoDevices = {}
 		this.picoButtons = {}
 		this.scenes = {}
+		this.sceneAssignments = {}
+		this.sceneVariableIds = {}
+		this.sceneActive = {}
 		this.currentFanSpeed = {}
 		this.fanVariableIds = {}
 		this.fanPercentVariableIds = {}
@@ -321,6 +334,11 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		await SubscribeToOccupancy(this)
 		this.updateActions()
 		this.updateVariableDefinitions()
+
+		// Which levels each scene sets is a long read, so it comes last; scene-active
+		// variables start at 0 and fill in once it finishes.
+		await LoadSceneAssignments(this)
+		this.updateVariableDefinitions()
 	}
 
 	createLeapClient(): LeapClient {
@@ -522,6 +540,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		}
 
 		refreshSelectedLightLevel(this, device)
+		RefreshSceneActive(this, device)
 	}
 
 	handleFanStatus(device: DeviceDefinition, body: BodyType | undefined): void {
@@ -561,18 +580,21 @@ export class ModuleInstance extends InstanceBase<ModuleConfig, ModuleSecrets> {
 		const fanVariables = BuildFanVariableDefinitions(this)
 		const occupancyVariables = BuildOccupancyVariableDefinitions(this)
 		const selectedLightVariables = BuildSelectedLightVariableDefinitions(this)
+		const sceneVariables = BuildSceneVariableDefinitions(this)
 		this.setVariableDefinitions([
 			...deviceVariables,
 			...picoVariables,
 			...fanVariables,
 			...occupancyVariables,
 			...selectedLightVariables,
+			...sceneVariables,
 		])
 		SeedDeviceVariableValues(this)
 		SeedPicoVariableValues(this)
 		SeedFanVariableValues(this)
 		SeedOccupancyVariableValues(this)
 		SeedSelectedLightVariableValues(this)
+		SeedSceneVariableValues(this)
 	}
 }
 

@@ -3,6 +3,7 @@ import type { ModuleInstance } from './main.js'
 import { getDeviceLevelType, getDeviceLabel } from './deviceTypes.js'
 import { BuildSetFanAction } from './fans.js'
 import { BuildSetSceneAction, RefreshScenes } from './scenes.js'
+import { LoadSceneAssignments } from './sceneState.js'
 import { BuildSmartControlActions } from './smartControl.js'
 import { computeLevelForMode, sendLevel } from './levelControl.js'
 import { BuildSelectedLightAction, markLightSelected } from './selectedLight.js'
@@ -49,6 +50,8 @@ function createSystemActions(self: ModuleInstance): Record<string, CompanionActi
 				self.log('info', 'Refreshing scenes...')
 				await RefreshScenes(self)
 				self.updateActions()
+				await LoadSceneAssignments(self)
+				self.updateVariableDefinitions()
 			},
 		},
 	}
