@@ -3,7 +3,7 @@ import type { ModuleInstance } from './main.js'
 import { getDeviceLevelType, getDeviceLabel } from './deviceTypes.js'
 import { BuildSetFanAction } from './fans.js'
 import { BuildSetSceneAction, RefreshScenes } from './scenes.js'
-import { BuildSmartControlAction } from './smartControl.js'
+import { BuildSmartControlActions } from './smartControl.js'
 import { computeLevelForMode, sendLevel } from './levelControl.js'
 import { BuildSelectedLightAction, markLightSelected } from './selectedLight.js'
 
@@ -12,7 +12,7 @@ export function UpdateActions(self: ModuleInstance): void {
 		...BuildSetControlAction(self),
 		...BuildSetFanAction(self),
 		...BuildSetSceneAction(self),
-		...BuildSmartControlAction(self),
+		...BuildSmartControlActions(self),
 		...BuildSelectedLightAction(self),
 		...createSystemActions(self),
 	})
