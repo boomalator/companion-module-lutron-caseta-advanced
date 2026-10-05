@@ -482,7 +482,7 @@
 			"connectionId": "internal",
 			"options": {
 				"expression": {
-					"value": "max($(Caseta1:motion_stairs_last_true), $(Caseta1:motion_stairs_last_false)) == 0 ? -1 : floor((unixNow() - max($(Caseta1:motion_stairs_last_true), $(Caseta1:motion_stairs_last_false)) + $(internal:time_s) * 0) / 1000)",
+					"value": "max($(Caseta1:motion_stairs_last_true), $(Caseta1:motion_stairs_last_false)) > 0 ? floor((unixNow() - max($(Caseta1:motion_stairs_last_true), $(Caseta1:motion_stairs_last_false)) + $(internal:time_s) * 0) / 1000) : -1",
 					"isExpression": true
 				}
 			},

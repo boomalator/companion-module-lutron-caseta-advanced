@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="-6 -6 112 112">
+<title>Vacant: dotted outline of an empty seat</title>
+<g fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 10">
+<circle cx="50" cy="31" r="17"/>
+<path d="M15 90C15 66 31 55 50 55S85 66 85 90Z"/></g>
+</svg>

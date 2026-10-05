@@ -491,7 +491,7 @@
 							"connectionId": "internal",
 							"options": {
 								"expression": {
-									"value": "max($(Caseta1:motion_downstairs_last_true), $(Caseta1:motion_downstairs_last_false)) == 0 ? -1 : floor((unixNow() - max($(Caseta1:motion_downstairs_last_true), $(Caseta1:motion_downstairs_last_false)) + $(internal:time_s) * 0) / 1000)",
+									"value": "max($(Caseta1:motion_downstairs_last_true), $(Caseta1:motion_downstairs_last_false)) > 0 ? floor((unixNow() - max($(Caseta1:motion_downstairs_last_true), $(Caseta1:motion_downstairs_last_false)) + $(internal:time_s) * 0) / 1000) : -1",
 									"isExpression": true
 								}
 							},
@@ -990,7 +990,7 @@
 							"connectionId": "internal",
 							"options": {
 								"expression": {
-									"value": "max($(Caseta1:motion_stairs_last_true), $(Caseta1:motion_stairs_last_false)) == 0 ? -1 : floor((unixNow() - max($(Caseta1:motion_stairs_last_true), $(Caseta1:motion_stairs_last_false)) + $(internal:time_s) * 0) / 1000)",
+									"value": "max($(Caseta1:motion_stairs_last_true), $(Caseta1:motion_stairs_last_false)) > 0 ? floor((unixNow() - max($(Caseta1:motion_stairs_last_true), $(Caseta1:motion_stairs_last_false)) + $(internal:time_s) * 0) / 1000) : -1",
 									"isExpression": true
 								}
 							},
@@ -1489,7 +1489,7 @@
 							"connectionId": "internal",
 							"options": {
 								"expression": {
-									"value": "max($(Caseta1:laundry_motion_last_true), $(Caseta1:laundry_motion_last_false)) == 0 ? -1 : floor((unixNow() - max($(Caseta1:laundry_motion_last_true), $(Caseta1:laundry_motion_last_false)) + $(internal:time_s) * 0) / 1000)",
+									"value": "max($(Caseta1:laundry_motion_last_true), $(Caseta1:laundry_motion_last_false)) > 0 ? floor((unixNow() - max($(Caseta1:laundry_motion_last_true), $(Caseta1:laundry_motion_last_false)) + $(internal:time_s) * 0) / 1000) : -1",
 									"isExpression": true
 								}
 							},
@@ -1988,7 +1988,7 @@
 							"connectionId": "internal",
 							"options": {
 								"expression": {
-									"value": "max($(Caseta1:garage_sensor_last_true), $(Caseta1:garage_sensor_last_false)) == 0 ? -1 : floor((unixNow() - max($(Caseta1:garage_sensor_last_true), $(Caseta1:garage_sensor_last_false)) + $(internal:time_s) * 0) / 1000)",
+									"value": "max($(Caseta1:garage_sensor_last_true), $(Caseta1:garage_sensor_last_false)) > 0 ? floor((unixNow() - max($(Caseta1:garage_sensor_last_true), $(Caseta1:garage_sensor_last_false)) + $(internal:time_s) * 0) / 1000) : -1",
 									"isExpression": true
 								}
 							},
