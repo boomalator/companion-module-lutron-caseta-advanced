@@ -1,0 +1,18 @@
+[
+	{
+		"name": "Garage Sensor",
+		"variableBase": "garage_sensor"
+	},
+	{
+		"name": "Laundry motion",
+		"variableBase": "laundry_motion"
+	},
+	{
+		"name": "Motion Downstairs",
+		"variableBase": "motion_downstairs"
+	},
+	{
+		"name": "Motion Stairs",
+		"variableBase": "motion_stairs"
+	}
+]

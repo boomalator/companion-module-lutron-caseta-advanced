@@ -112,24 +112,27 @@ export function autoLines(name, limitEm = Infinity) {
 	return lines
 }
 
-// Checks every item's two-line label: at most two lines, each at most MAX_LINE_CHARS and no
-// wider than the layer (limitEm, see lineLimitEm) so that nothing wraps into a third line, and
-// no two buttons with the same label (a warning instead when allowDuplicates is set).
-// describe(item) names an item in messages.
-export function validateLabels(items, describe, { allowDuplicates = false, limitEm = Infinity } = {}) {
+// Checks every item's label: at most maxLines lines (two unless said otherwise), each at most
+// maxChars (MAX_LINE_CHARS unless said otherwise) and no wider than the layer (limitEm, see
+// lineLimitEm) so that nothing wraps into an extra line, and no two buttons with the same
+// label (a warning instead when allowDuplicates is set). describe(item) names an item in messages.
+export function validateLabels(
+	items,
+	describe,
+	{ allowDuplicates = false, limitEm = Infinity, maxLines = 2, maxChars = MAX_LINE_CHARS } = {},
+) {
 	const seen = new Map()
 	for (const item of items) {
 		const lines = item.buttonLines
-		if (!Array.isArray(lines) || lines.length < 1 || lines.length > 2)
-			throw new Error(`${describe(item)}: buttonLines must be 1-2 lines`)
+		if (!Array.isArray(lines) || lines.length < 1 || lines.length > maxLines)
+			throw new Error(`${describe(item)}: buttonLines must be 1-${maxLines} lines`)
 		for (const line of lines) {
-			if (line.length > MAX_LINE_CHARS)
-				throw new Error(`${describe(item)}: "${line}" is over ${MAX_LINE_CHARS} characters`)
+			if (line.length > maxChars) throw new Error(`${describe(item)}: "${line}" is over ${maxChars} characters`)
 		}
 		const drawn = lines.reduce((total, line) => total + drawnLines(line, limitEm), 0)
-		if (drawn > 2) {
+		if (drawn > maxLines) {
 			throw new Error(
-				`${describe(item)}: "${lines.join(' / ')}" is drawn as ${drawn} lines at this button's text size (the limit is 2)`,
+				`${describe(item)}: "${lines.join(' / ')}" is drawn as ${drawn} lines at this button's text size (the limit is ${maxLines})`,
 			)
 		}
 		const key = lines.join(' / ')

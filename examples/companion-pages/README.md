@@ -1,4 +1,4 @@
-# Companion page samples: lights, switches and scenes
+# Companion page samples: lights, switches, scenes and sensors
 
 Ready-to-import Companion pages for this module, plus the generators that made them:
 
@@ -6,11 +6,12 @@ Ready-to-import Companion pages for this module, plus the generators that made t
 - **Switches**: a button for every switch, outdoor ones included
   (`switches-page-N.companionconfig`).
 - **Scenes**: a button for every Lutron scene (`scenes-page-N.companionconfig`).
+- **Sensors**: a button for every occupancy sensor (`sensors-page-N.companionconfig`).
 
-Both kinds of page share a layout: each uses only 13 slots, to suit small surfaces and
+All of them share a layout: each uses only 13 slots, to suit small surfaces and
 easy testing. That is columns 0-4 of rows 0 and 1, and columns 0-2 of row 2. Row 2
 columns 3 and 4 are navigation: **Page Down** (back) at 2/3 and **Page Up** (next) at
-2/4. Buttons are grouped (lights by Lutron area, scenes by room), each group starts on a
+2/4. Buttons are grouped (lights by Lutron area, switches and scenes by room), each group starts on a
 fresh row, and a group stays on one page when it fits.
 
 ## Light buttons
@@ -101,17 +102,21 @@ so the same number looks twice as large on a layer half the height.
 ## Files
 
 - `lights-page-N.companionconfig`, `switches-page-N.companionconfig`,
-  `scenes-page-N.companionconfig`: the importable pages (JSON content; the `.companionconfig` extension is what Companion's file
+  `scenes-page-N.companionconfig`, `sensors-page-N.companionconfig`: the importable pages (JSON content; the `.companionconfig` extension is what Companion's file
   picker filters on).
-- `reference-button.json`, `reference-switch-button.json`, `reference-scene-button.json`: the hand-built buttons every
+- `reference-button.json`, `reference-switch-button.json`, `reference-scene-button.json`,
+  `reference-sensor-button.json`: the hand-built buttons every
   other button is copied from. Edit the look or behaviour in Companion, export, and
   replace the file.
 - `devices.json`: the dimmers, with their exact module variable names and the two-line
   button labels.
 - `switches.json`: the switches, with their exact module variable names.
 - `scenes.json`: the scenes, as the bridge reports them (name and bridge id).
-- `generate-light-pages.mjs`, `generate-switch-pages.mjs`, `generate-scene-pages.mjs`:
-  build the page files.
+- `sensors.json`: the occupancy sensors, with their exact module variable names.
+- `icons/`: the pictures on the sensor buttons, as the PNGs embedded in the reference button
+  (`occupied-walking.png`, `vacant-zzz.png`) and the SVGs they were drawn from.
+- `generate-light-pages.mjs`, `generate-switch-pages.mjs`, `generate-scene-pages.mjs`,
+  `generate-sensor-pages.mjs`: build the page files.
 - `page-lib.mjs`: layout, navigation and file writing shared by the generators.
 
 ## Importing
@@ -174,3 +179,21 @@ and secrets, which for this module are the bridge's client certificate and
 private key. The generators write a bare connection block instead. If you add
 your own exports to a repo, remove the `instances` section's `config` and
 `secrets` first.
+
+`sensors.json` lists each occupancy sensor's `name` in the bridge and its `variableBase`: the
+part of its variables before `_occupied` in Companion's Variables list (the Lutron area and
+the sensor's name, lower-cased with underscores). How each one is labelled comes from
+`SENSOR_STYLES` in `generate-sensor-pages.mjs`, by name; a sensor with no entry still gets a
+button, labelled with its name. The label is one line. Then:
+
+```
+node generate-sensor-pages.mjs
+```
+
+A sensor button shows a walking figure on the olive of a lit light while the sensor is
+occupied and Zzz while it is vacant, with the time spent in that state (1s to 59s, 1m to
+59m, then 1:00, 1:01 and so on; blank until the module has seen the sensor change), and an
+amber dot when the sensor's battery isn't Good or the bridge can't reach it. The pictures
+are PNGs stored inside the button's image layers, so they travel with the page file and
+need nothing from Companion's image library. The time is kept by a button-local variable
+(`Secs`).
